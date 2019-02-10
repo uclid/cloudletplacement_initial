@@ -6,7 +6,7 @@ public class Cloudlet {
 	public int radius;
 	
 	/**
-	 * 
+	 * @author Dixit Bhatta
 	 * @param processor processing capacity
 	 * @param memory memory capacity
 	 * @param storage storage capacity
