@@ -41,7 +41,7 @@ public class RunGenetic {
 		int[][] latency = reader.getLatencies(num_devices, num_candidates);
 	
 		long startTime = System.nanoTime();
-		CloudletPlacement place = new CloudletPlacement();
+		GeneticCloudletPlacement place = new GeneticCloudletPlacement();
 		place.geneticAlgorithm(cloudlets, points, devices, cost, latency);
 		long endTime = System.nanoTime();
 		

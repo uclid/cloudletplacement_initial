@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import ilog.concert.*;
 import ilog.cplex.*;
 
-public class CloudletPlacement {
+public class CplexCloudletPlacement {
 	
 	/**
 	 * @author Dixit Bhatta

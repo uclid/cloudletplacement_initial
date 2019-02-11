@@ -42,7 +42,7 @@ public class RunCplex {
 		
 		//timing the CPLEX run
 		long startTime = System.nanoTime();
-		CloudletPlacement place = new CloudletPlacement();
+		CplexCloudletPlacement place = new CplexCloudletPlacement();
 		place.cplexModel(cloudlets, points, devices, cost, latency);
 		long endTime = System.nanoTime();
 		

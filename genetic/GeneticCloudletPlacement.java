@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class CloudletPlacement {
+public class GeneticCloudletPlacement {
 
 	/**
 	 * @author Dixit Bhatta
