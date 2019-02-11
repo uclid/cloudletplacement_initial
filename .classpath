@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="classes"/>
+	<classpathentry kind="src" path="cplex_java"/>
+	<classpathentry kind="src" path="genetic"/>
+	<classpathentry kind="src" path="util"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
