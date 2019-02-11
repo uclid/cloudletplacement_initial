@@ -1,114 +1,231 @@
 import java.util.ArrayList;
 
-public class RunCplex {
-	
-	public static void main(String[] args){
-		
-		//5 cloudlets as per our optimization example
-		ArrayList<Cloudlet> cloudlets = new ArrayList<Cloudlet>();
-		cloudlets.add(new Cloudlet(50, 50, 50, 1));
-		cloudlets.add(new Cloudlet(100, 100, 100,2));
-		cloudlets.add(new Cloudlet(100, 100, 100,2));
-		cloudlets.add(new Cloudlet(100, 100, 100,2));
-		cloudlets.add(new Cloudlet(200, 200, 200,3));
-		
-		//25 end devices as per our optimization example
-		ArrayList<EndDevice> devices = new ArrayList<EndDevice>();
-		devices.add(new EndDevice(10,10,10,2,0));
-		devices.add(new EndDevice(20,20,20,2,0));
-		devices.add(new EndDevice(10,10,10,3,0));
-		devices.add(new EndDevice(20,20,20,3,0));
-		devices.add(new EndDevice(10,10,10,3,0));
-		devices.add(new EndDevice(10,10,10,0,1));
-		devices.add(new EndDevice(20,20,20,1,1));
-		devices.add(new EndDevice(10,10,10,2,1));
-		devices.add(new EndDevice(20,20,20,2,1));
-		devices.add(new EndDevice(20,20,20,2,1));
-		devices.add(new EndDevice(10,10,10,4,1));
-		devices.add(new EndDevice(20,20,20,0,2));
-		devices.add(new EndDevice(10,10,10,1,2));
-		devices.add(new EndDevice(20,20,20,1,2));
-		devices.add(new EndDevice(10,10,10,1,2));
-		devices.add(new EndDevice(10,10,10,2,2));
-		devices.add(new EndDevice(20,20,20,3,2));
-		devices.add(new EndDevice(10,10,10,3,2));
-		devices.add(new EndDevice(20,20,20,0,3));
-		devices.add(new EndDevice(20,20,20,0,3));
-		devices.add(new EndDevice(10,10,10,0,3));
-		devices.add(new EndDevice(20,20,20,0,3));
-		devices.add(new EndDevice(10,10,10,1,3));
-		devices.add(new EndDevice(20,20,20,4,3));
-		devices.add(new EndDevice(10,10,10,4,3));
-		
-		//7 candidate points as per our optimization example
-		ArrayList<CandidatePoint> points = new ArrayList<CandidatePoint>();
-		points.add(new CandidatePoint(1,0));
-		points.add(new CandidatePoint(3,0));
-		points.add(new CandidatePoint(0,1));
-		points.add(new CandidatePoint(3,1));
-		points.add(new CandidatePoint(1,2));
-		points.add(new CandidatePoint(2,2));
-		points.add(new CandidatePoint(3,3));
-		
-		//Cost Matrix
-		int[][] cost = {
-			{ 1,  2,  1,  2,  2,  1,  1},
-			{ 2,  3,  2,  3,  3,  2,  2},
-			{ 2,  3,  2,  3,  3,  2,  2},
-			{ 2,  3,  2,  3,  3,  2,  2},
-			{ 5,  6,  5,  6,  6,  5,  5}
-		}; 
-		
-		//Latency Matrix
-		int[][] latency = {
-           	{ 10,  10,  22,  14,  22,  20,  32},//l1
-           	{ 10,  10,  22,  14,  22,  20,  32},
-           			
-           	{ 20,   0,  32,  10,  28,  22,  30},//l2
-           	{ 20,   0,  32,  10,  28,  22,  30},
-           	{ 20,   0,  32,  10,  28,  22,  30},
-           			
-           	{ 14,  32,   0,  30,  14,  22,  36},//l3
-           			
-           	{ 10,  14,  10,  20,  10,  14,  28},//l4
-           			
-           	{ 14,  14,  20,  10,  14,  10,  22},//l5
-           	{ 14,  14,  20,  10,  14,  10,  22},
-           	{ 14,  14,  20,  10,  14,  10,  22},
-           			
-           	{ 32,  14,  40,  10,  32,  22,  22},//l6
-		               			
-   			{ 22,  36,  10,  32,  10,  20,  32},//l7
-   			
-   			{ 20,  28,  14,  22,   0,  10,  22},//l8
-   			{ 20,  28,  14,  22,   0,  10,  22},
-   			{ 20,  28,  14,  22,   0,  10,  22},
-   			
-   			{ 22,  22,  12,  14,  10,   0,  14},//l9
-   			
-   			{ 28,  20,  32,  10,  20,  10,  10},//l10
-   			{ 28,  20,  32,  10,  20,  10,  10},
-   			
-   			{ 32,  42,  20,  36,  14,  22,  30},//l11
-   			{ 32,  42,  20,  36,  14,  22,  30},
-   			{ 32,  42,  20,  36,  14,  22,  30},
-   			{ 32,  42,  20,  36,  14,  22,  30},
-   			
-   			{ 30,  36,  22,  28,  10,  14,  20},//l12
-   			
-   			{ 45,  32,  45,  22,  32,  22,  10},//l13
-   			{ 45,  32,  45,  22,  32,  22,  10}
-		};
-		
-		long startTime = System.nanoTime();
-		CloudletPlacement place = new CloudletPlacement();
-		place.cplexModel(cloudlets, points, devices, cost, latency);
-		long endTime = System.nanoTime();
-		
-		long duration = (endTime - startTime)/1000000;
-		
-		System.out.println("Time = " + duration + " ms");
-		
-	}
+import ilog.concert.*;
+import ilog.cplex.*;
 
+public class CloudletPlacement {
+	
+	/**
+	 * @author Dixit Bhatta
+	 * The method takes the decision variables, constraints,
+	 * and solution arrays as arguments and displays the
+	 * solution if there a feasible one.
+	 * @param C set of cloudlets
+	 * @param P set of candidate points
+	 * @param V set of end devices
+	 * @param cost placement cost matrix
+	 * @param latency latency matrix
+	 */
+	public void cplexModel(ArrayList<Cloudlet> C, ArrayList<CandidatePoint> P , 
+			ArrayList<EndDevice> E, int[][] cost, int[][] latency) {
+		
+		int w = C.size();
+		int n = P.size();
+		int v = E.size();
+		
+		try {
+			//new model object
+			IloCplex model = new IloCplex();
+			
+			//the decision variable y_{jk}
+			IloIntVar[][] y = new IloIntVar[w][n];
+			//specifying range for the decision variable, 0 or 1
+			for(int j = 0; j < w; j++) {
+				for(int k = 0; k < n; k++) {
+					y[j][k] = model.boolVar();
+				}
+			}
+			
+			//the decision variable a_{ik}
+			IloIntVar[][] a = new IloIntVar[v][n];
+			//specifying range for the decision variable, 0 or 1
+			for(int i = 0; i < v; i++) {
+				for(int k = 0; k < n; k++) {
+					a[i][k] = model.boolVar();
+				}
+			}
+			
+			//objective functions, enable only one of them for solving
+			//cost minimization
+			IloLinearNumExpr cost_obj = model.linearNumExpr();
+			for(int j = 0; j < w; j++) {
+				for(int k = 0; k < n; k++) {
+					cost_obj.addTerm(y[j][k], cost[j][k]);
+				}
+			}
+			
+			//latency minimization
+			/*
+			IloLinearNumExpr latency_obj = model.linearNumExpr();
+			for(int i = 0; i < v; i++) {
+				for(int k = 0; k < n; k++) {
+					latency_obj.addTerm(a[i][k], latency[i][k]);
+				}
+			}*/
+			
+			//minimize the objective function
+			model.addMinimize(cost_obj);
+			//model.addMinimize(latency_obj);
+			
+			/*
+			 * Adding the constraints now. Note that we are creating 
+			 * each constraint individually and adding to the model
+			 * */
+			
+			/*Constraint 1: The total number of cloudlets placed 
+			 * in the grid space should be less than or equal to 
+			 * number of available cloudlets.*/
+			IloLinearNumExpr num_cloudlets = model.linearNumExpr();
+			for(int j = 0; j < w; j++) {
+				for(int k = 0; k < n; k++) {
+					num_cloudlets.addTerm(y[j][k], 1);
+				}
+			}
+			model.addLe(num_cloudlets, w);
+			
+			/*Constraint 2: Each end device must be within coverage
+			 * range of some cloudlet.*/
+			for(int i = 0; i < v; i++) {
+				for(int k = 0; k < n; k++) {
+					double dist = distance(E.get(i).xlocation, E.get(i).ylocation, P.get(k).xlocation, P.get(k).ylocation);
+					IloLinearNumExpr radius = model.linearNumExpr();
+					for(int j = 0; j < w; j++) {
+						radius.addTerm(y[j][k], C.get(j).radius);
+					}
+					IloLinearNumExpr covered = model.linearNumExpr();
+					covered.addTerm(a[i][k], dist);
+					model.addLe(covered, radius);
+				}
+			}
+			
+			
+			/*Constraint 3: Sum of memory demand of served end 
+			 * devices should be less than or equal to serving cloudlet.*/
+			for(int k = 0; k < n; k++) {
+				IloLinearNumExpr devices_mem = model.linearNumExpr();
+				for(int i = 0; i < v; i++) {
+					devices_mem.addTerm(a[i][k], E.get(i).memory);
+				}
+				IloLinearNumExpr cloudlet_mem = model.linearNumExpr();
+				for(int j = 0; j < w; j++) {
+					cloudlet_mem.addTerm(y[j][k], C.get(j).memory);
+				}
+				model.addLe(devices_mem, cloudlet_mem);
+			}
+			
+			/*Constraint 4: Sum of storage demand of served end 
+			 * devices should be less than or equal to serving cloudlet.*/
+			for(int k = 0; k < n; k++) {
+				IloLinearNumExpr devices_stor = model.linearNumExpr();
+				for(int i = 0; i < v; i++) {
+					devices_stor.addTerm(a[i][k], E.get(i).storage);
+				}
+				IloLinearNumExpr cloudlet_stor = model.linearNumExpr();
+				for(int j = 0; j < w; j++) {
+					cloudlet_stor.addTerm(y[j][k], C.get(j).storage);
+				}
+				model.addLe(devices_stor, cloudlet_stor);
+			}
+
+			/*Constraint 5: Sum of processing demand of served end devices
+			 * should be less than or equal to serving cloudlet.*/
+			for(int k = 0; k < n; k++) {
+				IloLinearNumExpr devices_proc = model.linearNumExpr();
+				for(int i = 0; i < v; i++) {
+					devices_proc.addTerm(a[i][k], E.get(i).processor);
+				}
+				IloLinearNumExpr cloudlet_proc = model.linearNumExpr();
+				for(int j = 0; j < w; j++) {
+					cloudlet_proc.addTerm(y[j][k], C.get(j).processor);
+				}
+				model.addLe(devices_proc, cloudlet_proc);
+			}
+			
+			/*Constraint 6: An end device can be served from a candidate 
+			 * point only if there is at least one cloudlet placed there.*/
+			for(int i = 0; i < v; i++) {
+				for(int k = 0; k < n; k++) {
+					IloLinearNumExpr cloudlet_placed = model.linearNumExpr();
+					for(int j = 0; j < w; j++) {
+						cloudlet_placed.addTerm(y[j][k], 1);
+					}
+					model.addLe(a[i][k], cloudlet_placed);
+				}
+			}
+			
+			/*Constraint 7: At most one cloudlet can be placed at
+			 * a candidate point.*/
+			for(int k = 0; k < n; k++) {
+				IloLinearNumExpr cloudlet_placed = model.linearNumExpr();
+				for(int j=0; j < w; j++) {
+					cloudlet_placed.addTerm(y[j][k], 1);
+				}
+				model.addLe(cloudlet_placed, 1);
+			}
+			
+			/*Constraint 8: A cloudlet can only be placed at a 
+			 * single candidate point.*/
+			for(int j = 0; j < w; j++) {
+				IloLinearNumExpr point = model.linearNumExpr();
+				for(int k=0; k < n; k++) {
+					point.addTerm(y[j][k], 1);
+				}
+				model.addLe(point, 1);
+			}
+			
+			/*Constraint 9: All end devices must be served, each 
+			 * from exactly one candidate point.*/
+			for(int i = 0; i < v; i++) {
+				IloLinearNumExpr point = model.linearNumExpr();
+				for(int k=0; k < n; k++) {
+					point.addTerm(a[i][k], 1);
+				}
+				model.addEq(point, 1);
+			}
+			
+			/*
+			 * Now towards solving the model
+			 * */
+			boolean isSolved = model.solve();
+			if(isSolved) {
+				double objValue = model.getObjValue();
+				System.out.println("\nObjective value is: " + objValue);
+				System.out.print("\nCloudlet Assignments\n");
+				for(int j = 0; j < w; j++) {
+					for(int k=0; k < n; k++) {
+						System.out.print(" y[" + j + "][" + k + "] = " + model.getValue(y[j][k]));
+					}
+					System.out.println("\n");
+				}
+				System.out.print("\nDevice Assignments\n");
+				for(int i = 0; i < v; i++) {
+					for(int k=0; k < n; k++) {
+						System.out.print(" a[" + i + "][" + k + "] = " + model.getValue(a[i][k]));
+					}
+					System.out.println("\n");
+				}
+				
+			}
+			else {
+				System.out.println("Model has not been solved!");
+			}
+			
+		
+		}
+		catch(IloException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	public double distance(int x1, int y1, int x2, int y2) {
+		int y_diff = y2-y1;
+		int x_diff = x2-x1;
+		
+		double x_sqr = Math.pow(x_diff, 2);
+		double y_sqr = Math.pow(y_diff, 2);
+		
+		double dist = Math.sqrt(x_sqr + y_sqr);
+		
+		return dist;
+	}
 }
