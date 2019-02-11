@@ -11,7 +11,7 @@ public class CloudletPlacement {
 	 * and solution arrays as arguments and displays the
 	 * solution if there a feasible one.
 	 * @param C set of cloudlets
-	 * @param N set of candidate points
+	 * @param P set of candidate points
 	 * @param V set of end devices
 	 * @param cost placement cost matrix
 	 * @param latency latency matrix
