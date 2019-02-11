@@ -29,16 +29,6 @@ public class GeneticCloudletPlacement {
 		int[][] a = new int[v][n];
 		a = deviceAssignments(v, n);
 		
-		while(!underThreshold(C, P, E)) {
-			PriorityQueue<int[]> pq = new PriorityQueue(w);
-			
-		}
-		
-	}
-
-	private boolean underThreshold(ArrayList<Cloudlet> c, ArrayList<CandidatePoint> p, ArrayList<EndDevice> e) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 	private int[][] deviceAssignments(int v, int n) {
