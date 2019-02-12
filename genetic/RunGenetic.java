@@ -21,19 +21,19 @@ public class RunGenetic {
 		
 		ArrayList<Cloudlet> cloudlets = new ArrayList<Cloudlet>();
 		for(int i = 0; i < cloudlet_specs.length; i++) {
-			cloudlets.add(new Cloudlet(i+1, cloudlet_specs[i][0], cloudlet_specs[i][1], 
-					cloudlet_specs[i][2], cloudlet_specs[i][3]));
+			cloudlets.add(new Cloudlet(cloudlet_specs[i][0], cloudlet_specs[i][1], 
+					cloudlet_specs[i][2], cloudlet_specs[i][3], cloudlet_specs[i][4]));
 		}
 		
 		ArrayList<EndDevice> devices = new ArrayList<EndDevice>();
 		for(int i = 0; i < device_specs.length; i++) {
-			devices.add(new EndDevice(i+1, device_specs[i][0], device_specs[i][1],
-					device_specs[i][2], device_specs[i][3], device_specs[i][4]));
+			devices.add(new EndDevice(device_specs[i][0], device_specs[i][1],
+					device_specs[i][2], device_specs[i][3], device_specs[i][4], device_specs[i][5]));
 		}
 		
 		ArrayList<CandidatePoint> points = new ArrayList<CandidatePoint>();
 		for(int i = 0; i < cand_points.length; i++) {
-			points.add(new CandidatePoint(i+1, cand_points[i][0], cand_points[i][1]));
+			points.add(new CandidatePoint(cand_points[i][0], cand_points[i][1], cand_points[i][2]));
 		}
 		
 		//Cost Matrix

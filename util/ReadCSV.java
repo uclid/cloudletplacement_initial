@@ -1,12 +1,13 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class ReadCSV {
     
     public int[][] getCloudlets(int num_cloudlets) {
     	//cloudlet specifications have 4 fields
-    	int[][] cloudlet_specs = new int[num_cloudlets][4];
+    	int[][] cloudlet_specs = new int[num_cloudlets][5];
     	
     	String csvFile = "data-files/example/example_cloudlet.csv";
         String line = "";
@@ -24,6 +25,7 @@ public class ReadCSV {
                 cloudlet_specs[i][1] = Integer.parseInt(item[1]);
                 cloudlet_specs[i][2] = Integer.parseInt(item[2]);
                 cloudlet_specs[i][3] = Integer.parseInt(item[3]);
+                cloudlet_specs[i][4] = Integer.parseInt(item[4]);
                 i++;
             }
 
@@ -36,7 +38,7 @@ public class ReadCSV {
     
     public int[][] getDevices(int num_devices) {
     	//device specifications have 5 fields
-    	int[][] device_specs = new int[num_devices][5];
+    	int[][] device_specs = new int[num_devices][6];
     	
     	String csvFile = "data-files/example/example_device.csv";
         String line = "";
@@ -55,6 +57,7 @@ public class ReadCSV {
                 device_specs[i][2] = Integer.parseInt(item[2]);
                 device_specs[i][3] = Integer.parseInt(item[3]);
                 device_specs[i][4] = Integer.parseInt(item[4]);
+                device_specs[i][5] = Integer.parseInt(item[5]);
                 i++;
             }
 
@@ -67,7 +70,7 @@ public class ReadCSV {
     
     public int[][] getPoints(int num_candidates) {
     	//device specifications have 5 fields
-    	int[][] cand_points = new int[num_candidates][2];
+    	int[][] cand_points = new int[num_candidates][3];
     	
     	String csvFile = "data-files/example/example_points.csv";
         String line = "";
@@ -83,6 +86,7 @@ public class ReadCSV {
 
                 cand_points[i][0] = Integer.parseInt(item[0]);
                 cand_points[i][1] = Integer.parseInt(item[1]);
+                cand_points[i][2] = Integer.parseInt(item[2]);
                 i++;
             }
 

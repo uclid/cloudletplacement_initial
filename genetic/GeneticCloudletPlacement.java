@@ -27,15 +27,15 @@ public class GeneticCloudletPlacement {
 		//variable holding assignments for the cloudlets
 		Cloudlet[][] cloudlets = new Cloudlet[m][n];
 		cloudlets = randomAssignments(C, n, m);
-		for(int i = 0; i < m; i++) {
-			System.out.println(Arrays.toString(cloudlets[i]));
-		}
+		//for(int i = 0; i < m; i++) {
+			//System.out.println(Arrays.toString(cloudlets[i]));
+		//}
 		
 		//variable holding assignment for devices
 		int[] devices = new int[v];
 		devices = deviceAssignments(P, E);
 		
-		System.out.println(Arrays.toString(devices));
+		//System.out.println(Arrays.toString(devices));
 		
 		//enclose this in while underThreshold()
 		
@@ -56,36 +56,54 @@ public class GeneticCloudletPlacement {
 			int x = rand.nextInt(10);
 			//System.out.println(x);
 			
-			//System.out.println("\nBefore Crossover");
-			//System.out.println("c1 " + Arrays.toString(c1));
-			//System.out.println("c2 " + Arrays.toString(c2));
+			System.out.println("\nBefore Crossover");
+			System.out.println("c1 " + Arrays.toString(c1) + "= " + fitness(c1, cost));
+			System.out.println("c2 " + Arrays.toString(c2) + "= " + fitness(c2, cost));
 			
 			//crossover probability is 0.5 for now
 			if(x >= 5) {
-				a1a2 = crossOver(c1,c2);
+				System.out.println("Crossover happend!");
+				a1a2 = crossOver(c1.clone(),c2.clone());
 			}
 			else {
-				a1a2[0] = c1;
-				a1a2[1] = c2;
+				a1a2[0] = c1.clone();
+				a1a2[1] = c2.clone();
 			}
-			
-			//System.out.println("\nAfter Crossover");
-			//System.out.println("a1 " + Arrays.toString(a1a2[0]));
-			//System.out.println("a2 " + Arrays.toString(a1a2[1]));
-			
-			//System.out.println("\nBefore mutation");
-			//System.out.println("a1 " + Arrays.toString(a1a2[0]));
-			//System.out.println("a2 " + Arrays.toString(a1a2[1]));
+
+			System.out.println("\nAfter Crossover, before mutation");
+			System.out.println("a1 " + Arrays.toString(a1a2[0])+ "= " + fitness(a1a2[0], cost));
+			System.out.println("a2 " + Arrays.toString(a1a2[1])+ "= " + fitness(a1a2[1], cost));
 			
 			a1a2[0] = mutate(a1a2[0]);
 			a1a2[1] = mutate(a1a2[1]);
 			
-			//System.out.println("\nAfter mutation");
-			//System.out.println("a1 " + Arrays.toString(a1a2[0]));
-			//System.out.println("a2 " + Arrays.toString(a1a2[1]));
+			System.out.println("\nAfter mutation");
+			System.out.println("a1 " + Arrays.toString(a1a2[0])+ "= " + fitness(a1a2[0], cost));
+			System.out.println("a2 " + Arrays.toString(a1a2[1])+ "= " + fitness(a1a2[1], cost));
+			System.out.println("c1 " + Arrays.toString(c1) + "= " + fitness(c1, cost));
+			System.out.println("c2 " + Arrays.toString(c2) + "= " + fitness(c2, cost));
+			
+			int fC = Math.min(fitness(c1, cost), fitness(c2, cost));
+			int fA = Math.min(fitness(a1a2[0], cost), fitness(a1a2[1], cost));
+			
+			System.out.println(fC + " " + fA);
 			
 			
+			
+			
+			
+	}
+
+	private int fitness(Cloudlet[] b, int[][] cost) {
+		// TODO Auto-generated method stub
+		int total_cost = 0;
 		
+		for(int i = 0; i < b.length; i++) {
+			if(b[i] != null) {
+				total_cost += cost[b[i].id - 1][i];
+			}
+		}
+		return total_cost;
 	}
 
 	private Cloudlet[] mutate(Cloudlet[] A) {
@@ -99,6 +117,7 @@ public class GeneticCloudletPlacement {
 			
 			//mutation probability is 0.1
 			if(x < 1) {
+				System.out.println("Mutation happend!");
 				//System.out.println(x);
 				//System.out.println(y);
 				if(y == 0) {
@@ -130,8 +149,8 @@ public class GeneticCloudletPlacement {
 		
 		for(int i = mid_point; i < c1.length; i++) {
 			Cloudlet buffer = c1[i];
-            c1[i] = c2[i];
-            c2[i] = buffer;
+			c1[i] = c2[i];
+			c2[i] = buffer;
 		}
 		
 		crossed[0] = c1;

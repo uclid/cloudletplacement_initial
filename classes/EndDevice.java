@@ -23,5 +23,18 @@ public class EndDevice {
 		this.xlocation = xlocation;
 		this.ylocation = ylocation;
 	}
+	
+	public String toString() {
+		String type = "";
+		
+		if(this.processor == 20) {
+			type = "high";
+		}
+		else {
+			type = "low";
+		}
+		
+		return type;
+	}
 
 }
