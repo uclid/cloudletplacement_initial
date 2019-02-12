@@ -12,6 +12,8 @@ public class RunGenetic {
 		int num_candidates = 7;
 		//number of assignments in the algorithm seed set
 		int assignment_size = 5;
+		//threshold value for coverage, 50% for now
+		double threshold = 0.8;
 		
 		ReadCSV reader = new ReadCSV();
 		int[][] cloudlet_specs = reader.getCloudlets(num_cloudlets);
@@ -44,7 +46,7 @@ public class RunGenetic {
 	
 		long startTime = System.nanoTime();
 		GeneticCloudletPlacement place = new GeneticCloudletPlacement();
-		place.geneticAlgorithm(cloudlets, points, devices, cost, latency, assignment_size);
+		place.geneticAlgorithm(cloudlets, points, devices, cost, latency, assignment_size, threshold);
 		long endTime = System.nanoTime();
 		
 		long duration = (endTime - startTime)/1000000;

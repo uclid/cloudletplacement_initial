@@ -1,4 +1,3 @@
-import java.util.Arrays;
 import java.util.Comparator;
 
 public class AssignmentsComparator implements Comparator<Cloudlet[]> {
@@ -12,16 +11,29 @@ public class AssignmentsComparator implements Comparator<Cloudlet[]> {
 	@Override
 	public int compare(Cloudlet[] a, Cloudlet[] b) {
 		// TODO Auto-generated method stub
-		if(placement_cost(a) < placement_cost(b)) {
+		if(leastZeroes(a) < leastZeroes(b)) {
 			return -1;
 		}
-		else if(placement_cost(a) > placement_cost(b)) {
+		else if(leastZeroes(a) > leastZeroes(b)) {
 			return 1;
 		}
 		
 		return 0;
 	}
 
+	private int leastZeroes(Cloudlet[] b) {
+		// TODO Auto-generated method stub
+		int zeroes = 0;
+		
+		for(int i = 0; i < b.length; i++) {
+			if(b[i] == null) {
+				zeroes++;
+			}
+		}
+		return zeroes;
+	}
+
+	/*
 	private int placement_cost(Cloudlet[] b) {
 		// TODO Auto-generated method stub
 		int total_cost = 0;
@@ -32,6 +44,6 @@ public class AssignmentsComparator implements Comparator<Cloudlet[]> {
 			}
 		}
 		return total_cost;
-	}
+	}*/
 
 }
