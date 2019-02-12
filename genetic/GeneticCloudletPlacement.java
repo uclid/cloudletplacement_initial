@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.PriorityQueue;
 import java.util.Random;
 
@@ -23,6 +24,7 @@ public class GeneticCloudletPlacement {
 		int n = P.size();
 		int v = E.size();
 		int m = assignment_size;
+		HashMap<Cloudlet[], Double> cover_map = new HashMap<Cloudlet[], Double>();
 		
 		//variable holding assignments for the cloudlets
 		Cloudlet[][] cloudlets = new Cloudlet[m][n];
@@ -39,74 +41,161 @@ public class GeneticCloudletPlacement {
 		
 		//enclose this in while underThreshold()
 		
-			ArrayList<Cloudlet[]> B = null;
+			ArrayList<Cloudlet[]> B = new ArrayList<Cloudlet[]>();
 			PriorityQueue<Cloudlet[]> pq = new PriorityQueue<Cloudlet[]>(m, new AssignmentsComparator(cost));
 			for(int i = 0; i < m; i++) {
 				pq.add(cloudlets[i]);
 			}
 			
-			Cloudlet[] c1 = pq.remove();
-			Cloudlet[] c2 = pq.remove();
-			//System.out.println(Arrays.toString(pq.remove()));
-			
-			Cloudlet[][] a1a2 = new Cloudlet[m][2];
-			
-			//for crossover probability
-			Random rand = new Random();
-			int x = rand.nextInt(10);
-			//System.out.println(x);
-			
-			System.out.println("Before Crossover");
-			System.out.println("c1 " + Arrays.toString(c1) + "= " + fitness(c1, cost));
-			System.out.println("c2 " + Arrays.toString(c2) + "= " + fitness(c2, cost));
-			
-			//crossover probability is 0.5 for now
-			if(x >= 5) {
-				System.out.println("Crossover happend!");
-				a1a2 = crossOver(c1.clone(),c2.clone());
+			while(B.size() <= m) {
+				Cloudlet[] c1 = new Cloudlet[n];
+				Cloudlet[] c2 = new Cloudlet[n];
+				Cloudlet[] a1 = new Cloudlet[n];
+				Cloudlet[] a2 = new Cloudlet[n];
+				
+				if(!pq.isEmpty()) {
+					c1 = pq.remove();
+				}
+				if(!pq.isEmpty()) {
+					c2 = pq.remove();
+				}
+				//System.out.println(Arrays.toString(pq.remove()));
+				
+				
+				//for crossover probability
+				Random rand = new Random();
+				int x = rand.nextInt(10);
+				//System.out.println(x);
+				
+				System.out.println("Before Crossover");
+				System.out.println("c1 " + Arrays.toString(c1) + "= " + fitness(c1, cost));
+				System.out.println("c2 " + Arrays.toString(c2) + "= " + fitness(c2, cost));
+				
+				//crossover probability is 0.5 for now
+				if(x >= 5) {
+					System.out.println("Crossover happend!");
+					a1 = crossOver(c1.clone(),c2.clone())[0];
+					a2 = crossOver(c1.clone(),c2.clone())[1];
+				}
+				else {
+					a1 = c1.clone();
+					a2 = c2.clone();
+				}
+	
+				System.out.println("\nAfter Crossover, before mutation");
+				System.out.println("a1 " + Arrays.toString(a1)+ "= " + fitness(a1, cost));
+				System.out.println("a2 " + Arrays.toString(a1)+ "= " + fitness(a1, cost));
+				
+				a1 = mutate(a1);
+				a2 = mutate(a2);
+				
+				System.out.println("\nAfter mutation");
+				System.out.println("a1 " + Arrays.toString(a1)+ "= " + fitness(a1, cost));
+				System.out.println("a2 " + Arrays.toString(a2)+ "= " + fitness(a2, cost));
+				System.out.println("c1 " + Arrays.toString(c1) + "= " + fitness(c1, cost));
+				System.out.println("c2 " + Arrays.toString(c2) + "= " + fitness(c2, cost));
+				
+				int c1_fit = fitness(c1, cost);
+				int c2_fit = fitness(c2, cost);
+				int a1_fit = fitness(a1, cost);
+				int a2_fit = fitness(a2, cost);
+				
+				int fC = Math.min(c1_fit, c2_fit);
+				int fA = Math.min(a1_fit, a2_fit);
+				
+				System.out.println(fC + " " + fA);
+				
+				System.out.println("\nBefore coverage");
+				System.out.println("a1 " + Arrays.toString(a1) + " = " + coverage(a1.clone(), devices, E, P));
+				System.out.println("a2 " + Arrays.toString(a2) + " = " + coverage(a2.clone(), devices, E, P));
+				System.out.println("c1 " + Arrays.toString(c1) + " = " + coverage(c1.clone(), devices, E, P));
+				System.out.println("c2 " + Arrays.toString(c2) + " = " + coverage(c2.clone(), devices, E, P));
+				
+				double c1_cover = coverage(c1.clone(), devices, E, P);
+				double c2_cover = coverage(c2.clone(), devices, E, P);
+				double a1_cover = coverage(a1.clone(), devices, E, P);
+				double a2_cover = coverage(a2.clone(), devices, E, P);
+				cover_map.put(c1, c1_cover);
+				cover_map.put(c2, c2_cover);
+				cover_map.put(a1, a1_cover);
+				cover_map.put(a2, a2_cover);
+				//System.out.println("Here==" + cover_map.get(a1));
+				
+				double Vc = Math.min(c1_cover, c2_cover);
+				double Va = Math.min(a1_cover, a2_cover);
+				
+				
+				System.out.println("\nAfter coverage");
+				System.out.println("a1 " + Arrays.toString(a1) + " = " + coverage(a1.clone(), devices, E, P));
+				System.out.println("a2 " + Arrays.toString(a2) + " = " + coverage(a2.clone(), devices, E, P));
+				System.out.println("c1 " + Arrays.toString(c1) + " = " + coverage(c1.clone(), devices, E, P));
+				System.out.println("c2 " + Arrays.toString(c2) + " = " + coverage(c2.clone(), devices, E, P));
+				System.out.println(Vc + " " + Va);
+				
+				ArrayList<Cloudlet[]> population = 	new ArrayList<Cloudlet[]>();
+				population.add(c1);
+				population.add(c2);
+				population.add(a1);
+				population.add(a2);
+				
+				Cloudlet[] IF = fittest(population, cover_map, cost);
+				//cover_map.put(IF, coverage(IF.clone(), devices, E, P));
+				//System.out.println(Arrays.toString(IF));
+				
+				if((fA < fC) || ((fA == fC) && (Va >= Vc))) {
+						//System.out.println(cover_map.get(a1a2[i]));
+						if(cover_map.get(a1) >= 0.5*cover_map.get(IF)) {
+							B.add(a1);
+							cover_map.remove(c1);
+						}
+						else {
+							B.add(c1);
+							cover_map.remove(a1);
+						}
+						if(cover_map.get(a2) >= 0.5*cover_map.get(IF)) {
+							B.add(a2);
+							cover_map.remove(c2);
+						}
+						else {
+							B.add(c2);
+							cover_map.remove(a2);
+						}
+				}
+				else {
+					B.add(c1);
+					B.add(c2);
+					cover_map.remove(a1);
+					cover_map.remove(a2);
+				}
+				//System.out.println(B.toString());
+				Cloudlet[][] temp = new Cloudlet[B.size()][n];
+				for(int i = 0; i<B.size(); i++) {
+					temp[i] = B.get(i);
+				}
+				cloudlets = temp;
 			}
-			else {
-				a1a2[0] = c1.clone();
-				a1a2[1] = c2.clone();
+			for(int i = 0; i<B.size(); i++) {
+				System.out.println(Arrays.toString(B.get(i)) + " " + cover_map.get(B.get(i)));
 			}
+			
+	}
 
-			System.out.println("\nAfter Crossover, before mutation");
-			System.out.println("a1 " + Arrays.toString(a1a2[0])+ "= " + fitness(a1a2[0], cost));
-			System.out.println("a2 " + Arrays.toString(a1a2[1])+ "= " + fitness(a1a2[1], cost));
-			
-			a1a2[0] = mutate(a1a2[0]);
-			a1a2[1] = mutate(a1a2[1]);
-			
-			System.out.println("\nAfter mutation");
-			System.out.println("a1 " + Arrays.toString(a1a2[0])+ "= " + fitness(a1a2[0], cost));
-			System.out.println("a2 " + Arrays.toString(a1a2[1])+ "= " + fitness(a1a2[1], cost));
-			System.out.println("c1 " + Arrays.toString(c1) + "= " + fitness(c1, cost));
-			System.out.println("c2 " + Arrays.toString(c2) + "= " + fitness(c2, cost));
-			
-			int fC = Math.min(fitness(c1, cost), fitness(c2, cost));
-			int fA = Math.min(fitness(a1a2[0], cost), fitness(a1a2[1], cost));
-			
-			System.out.println(fC + " " + fA);
-			
-			System.out.println("\nBefore coverage");
-			System.out.println("a1 " + Arrays.toString(a1a2[0]) + " = " + coverage(a1a2[0].clone(), devices, E, P));
-			System.out.println("a2 " + Arrays.toString(a1a2[1]) + " = " + coverage(a1a2[1].clone(), devices, E, P));
-			System.out.println("c1 " + Arrays.toString(c1) + " = " + coverage(c1.clone(), devices, E, P));
-			System.out.println("c2 " + Arrays.toString(c2) + " = " + coverage(c2.clone(), devices, E, P));
-			
-			double Vc = Math.min(coverage(c1.clone(), devices, E, P), coverage(c2.clone(), devices, E, P));
-			double Va = Math.min(coverage(a1a2[0].clone(), devices, E, P), coverage(a1a2[1].clone(), devices, E, P));
-			
-			
-			System.out.println("\nAfter coverage");
-			System.out.println("a1 " + Arrays.toString(a1a2[0]) + " = " + coverage(a1a2[0].clone(), devices, E, P));
-			System.out.println("a2 " + Arrays.toString(a1a2[1]) + " = " + coverage(a1a2[1].clone(), devices, E, P));
-			System.out.println("c1 " + Arrays.toString(c1) + " = " + coverage(c1.clone(), devices, E, P));
-			System.out.println("c2 " + Arrays.toString(c2) + " = " + coverage(c2.clone(), devices, E, P));
-			System.out.println(Vc + " " + Va);
-			
-			
-			
+	private Cloudlet[] fittest(ArrayList<Cloudlet[]> population, HashMap<Cloudlet[], Double> cover_map, int[][] cost) {
+		// TODO Auto-generated method stub
+		Cloudlet[] best = population.get(0);
+		
+		for(int i = 1; i < population.size(); i++) {
+			if(fitness(population.get(i), cost) < fitness(best, cost) ) {
+				best = population.get(i);
+			}
+			else if(fitness(population.get(i), cost) == fitness(best, cost)) {
+				if(cover_map.get(population.get(i)) > cover_map.get(best)) {
+					best = population.get(i);
+				}
+			}
+		}
+		
+		return best;
 	}
 
 	private double coverage(Cloudlet[] c1, int[] devices, ArrayList<EndDevice> E, ArrayList<CandidatePoint> P) {
@@ -160,10 +249,14 @@ public class GeneticCloudletPlacement {
 	private int fitness(Cloudlet[] b, int[][] cost) {
 		// TODO Auto-generated method stub
 		int total_cost = 0;
+		int zeroes = 0;
 		
 		for(int i = 0; i < b.length; i++) {
 			if(b[i] != null) {
 				total_cost += cost[b[i].id - 1][i];
+			}
+			else {
+				zeroes++;
 			}
 		}
 		return total_cost;
