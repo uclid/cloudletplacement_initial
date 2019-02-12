@@ -37,11 +37,19 @@ public class GeneticCloudletPlacement {
 		
 		System.out.println(Arrays.toString(devices));
 		
-		//replace this with while underThreshold()
-		for(int i = 0; i < 5; i++) {
-			
-		}
+		//enclose this in while underThreshold()
 		
+			ArrayList<Cloudlet[]> B = null;
+			PriorityQueue<Cloudlet[]> pq = new PriorityQueue<Cloudlet[]>(m, new AssignmentsComparator(cost));
+			for(int i = 0; i < m; i++) {
+				pq.add(cloudlets[i]);
+			}
+			
+			Cloudlet[] c1 = pq.remove();
+			Cloudlet[] c2 = pq.remove();
+			//System.out.println(Arrays.toString(pq.remove()));
+			
+			
 		
 		
 	}
