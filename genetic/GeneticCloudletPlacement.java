@@ -56,7 +56,7 @@ public class GeneticCloudletPlacement {
 			int x = rand.nextInt(10);
 			//System.out.println(x);
 			
-			System.out.println("\nBefore Crossover");
+			System.out.println("Before Crossover");
 			System.out.println("c1 " + Arrays.toString(c1) + "= " + fitness(c1, cost));
 			System.out.println("c2 " + Arrays.toString(c2) + "= " + fitness(c2, cost));
 			
@@ -88,10 +88,73 @@ public class GeneticCloudletPlacement {
 			
 			System.out.println(fC + " " + fA);
 			
+			System.out.println("\nBefore coverage");
+			System.out.println("a1 " + Arrays.toString(a1a2[0]) + " = " + coverage(a1a2[0].clone(), devices, E, P));
+			System.out.println("a2 " + Arrays.toString(a1a2[1]) + " = " + coverage(a1a2[1].clone(), devices, E, P));
+			System.out.println("c1 " + Arrays.toString(c1) + " = " + coverage(c1.clone(), devices, E, P));
+			System.out.println("c2 " + Arrays.toString(c2) + " = " + coverage(c2.clone(), devices, E, P));
+			
+			double Vc = Math.min(coverage(c1.clone(), devices, E, P), coverage(c2.clone(), devices, E, P));
+			double Va = Math.min(coverage(a1a2[0].clone(), devices, E, P), coverage(a1a2[1].clone(), devices, E, P));
+			
+			
+			System.out.println("\nAfter coverage");
+			System.out.println("a1 " + Arrays.toString(a1a2[0]) + " = " + coverage(a1a2[0].clone(), devices, E, P));
+			System.out.println("a2 " + Arrays.toString(a1a2[1]) + " = " + coverage(a1a2[1].clone(), devices, E, P));
+			System.out.println("c1 " + Arrays.toString(c1) + " = " + coverage(c1.clone(), devices, E, P));
+			System.out.println("c2 " + Arrays.toString(c2) + " = " + coverage(c2.clone(), devices, E, P));
+			System.out.println(Vc + " " + Va);
 			
 			
 			
-			
+	}
+
+	private double coverage(Cloudlet[] c1, int[] devices, ArrayList<EndDevice> E, ArrayList<CandidatePoint> P) {
+		// TODO Auto-generated method stub
+		double coverage = 0;
+		int[] processor = {0,0,0,0,0,0,0};
+		int[] memory = {0,0,0,0,0,0,0};
+		int[] storage = {0,0,0,0,0,0,0};
+		
+		for(int i = 0; i < c1.length; i++) {
+			if(c1[i] != null) {
+				processor[i] = c1[i].processor;
+				memory[i] = c1[i].memory;
+				storage[i] = c1[i].storage;
+			}
+		}
+		
+		for(int i = 0; i < devices.length; i++) {
+			int point = devices[i];
+			if(c1[point] != null) {
+				if(inRangeAndCapacity(point, processor, storage, memory, c1[point], E.get(i), P)) {
+					coverage++;
+					//System.out.println(processor[point] + " - " + c1[point].processor);
+					processor[point] -= E.get(i).processor;
+					memory[point] -= E.get(i).memory;
+					storage[point] -= E.get(i).storage;
+				}
+			}
+		}
+		
+		return coverage/E.size();
+	}
+
+	private boolean inRangeAndCapacity(int point, int[] processor, int[] storage, int[] memory, Cloudlet c1, EndDevice endDevice,
+			ArrayList<CandidatePoint> P) {
+		// TODO Auto-generated method stub
+		double d = distance(P.get(point).xlocation, P.get(point).ylocation,
+				endDevice.xlocation, endDevice.ylocation);
+		if(d <= c1.radius ){
+			if(endDevice.processor <= processor[point]) {
+				if(endDevice.memory <= memory[point]) {
+					if(endDevice.storage <= storage[point]){
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	private int fitness(Cloudlet[] b, int[][] cost) {
