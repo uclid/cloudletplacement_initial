@@ -10,6 +10,8 @@ public class RunGenetic {
 		int num_devices = 25;
 		//7 candidate points as per our optimization example
 		int num_candidates = 7;
+		//number of assignments in the algorithm seed set
+		int assignment_size = 5;
 		
 		ReadCSV reader = new ReadCSV();
 		int[][] cloudlet_specs = reader.getCloudlets(num_cloudlets);
@@ -42,7 +44,7 @@ public class RunGenetic {
 	
 		long startTime = System.nanoTime();
 		GeneticCloudletPlacement place = new GeneticCloudletPlacement();
-		place.geneticAlgorithm(cloudlets, points, devices, cost, latency);
+		place.geneticAlgorithm(cloudlets, points, devices, cost, latency, assignment_size);
 		long endTime = System.nanoTime();
 		
 		long duration = (endTime - startTime)/1000000;

@@ -20,5 +20,21 @@ public class Cloudlet {
 		this.storage = storage;
 		this.radius = radius;
 	}
+	
+	public String toString() {
+		String type = "";
+		
+		if(this.processor == 200) {
+			type = "c1";
+		}
+		else if(this.processor == 100) {
+			type = "c2";
+		}
+		else {
+			type = "c3";
+		}
+		
+		return type;
+	}
 
 }
