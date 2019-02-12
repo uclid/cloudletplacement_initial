@@ -73,8 +73,54 @@ public class GeneticCloudletPlacement {
 			//System.out.println("a1 " + Arrays.toString(a1a2[0]));
 			//System.out.println("a2 " + Arrays.toString(a1a2[1]));
 			
+			//System.out.println("\nBefore mutation");
+			//System.out.println("a1 " + Arrays.toString(a1a2[0]));
+			//System.out.println("a2 " + Arrays.toString(a1a2[1]));
+			
+			a1a2[0] = mutate(a1a2[0]);
+			a1a2[1] = mutate(a1a2[1]);
+			
+			//System.out.println("\nAfter mutation");
+			//System.out.println("a1 " + Arrays.toString(a1a2[0]));
+			//System.out.println("a2 " + Arrays.toString(a1a2[1]));
+			
 			
 		
+	}
+
+	private Cloudlet[] mutate(Cloudlet[] A) {
+		// TODO Auto-generated method stub
+		Cloudlet[] mutated = A;
+		
+		for(int i = 0; i < A.length; i++) {
+			Random rand = new Random();
+			int x = rand.nextInt(10);
+			int y = rand.nextInt(4);
+			
+			//mutation probability is 0.1
+			if(x < 1) {
+				//System.out.println(x);
+				//System.out.println(y);
+				if(y == 0) {
+					mutated[i] = null;
+				}
+				else if(y == 1) {
+					//large cloudlet has id 5
+					mutated[i] = new Cloudlet(5, 200,200,200,3);
+				}
+				else if(y == 2) {
+					//medium cloudlet has id 2, 3 or 4
+					mutated[i] = new Cloudlet(4, 100,100,100,2);
+				}
+				else{
+					//small cloudlet has id 1
+					mutated[i] = new Cloudlet(1, 50,50,50,1);
+				}
+			}
+			
+		}
+		
+		return mutated;
 	}
 
 	private Cloudlet[][] crossOver(Cloudlet[] c1, Cloudlet[] c2) {
