@@ -49,9 +49,49 @@ public class GeneticCloudletPlacement {
 			Cloudlet[] c2 = pq.remove();
 			//System.out.println(Arrays.toString(pq.remove()));
 			
+			Cloudlet[][] a1a2 = new Cloudlet[m][2];
+			
+			//for crossover probability
+			Random rand = new Random();
+			int x = rand.nextInt(10);
+			//System.out.println(x);
+			
+			//System.out.println("\nBefore Crossover");
+			//System.out.println("c1 " + Arrays.toString(c1));
+			//System.out.println("c2 " + Arrays.toString(c2));
+			
+			//crossover probability is 0.5 for now
+			if(x >= 5) {
+				a1a2 = crossOver(c1,c2);
+			}
+			else {
+				a1a2[0] = c1;
+				a1a2[1] = c2;
+			}
+			
+			//System.out.println("\nAfter Crossover");
+			//System.out.println("a1 " + Arrays.toString(a1a2[0]));
+			//System.out.println("a2 " + Arrays.toString(a1a2[1]));
+			
 			
 		
+	}
+
+	private Cloudlet[][] crossOver(Cloudlet[] c1, Cloudlet[] c2) {
+		// TODO Auto-generated method stub
+		Cloudlet[][] crossed = new Cloudlet[c1.length][2];
+		int mid_point = (int)Math.round(Math.ceil(c1.length/2.0));
 		
+		for(int i = mid_point; i < c1.length; i++) {
+			Cloudlet buffer = c1[i];
+            c1[i] = c2[i];
+            c2[i] = buffer;
+		}
+		
+		crossed[0] = c1;
+		crossed[1] = c2;
+		
+		return crossed;
 	}
 
 	private int[] deviceAssignments(ArrayList<CandidatePoint> P, ArrayList<EndDevice> E) {
