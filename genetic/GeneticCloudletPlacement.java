@@ -8,7 +8,8 @@ public class GeneticCloudletPlacement {
 
 	private int estimate_optimal_cost = 0;
 	private int final_cost = 0;
-	private double final_latency = 0; 
+	private double final_latency = 0;
+	private double final_coverage = 0;
 
 	/**
 	 * @author Dixit Bhatta
@@ -198,8 +199,9 @@ public class GeneticCloudletPlacement {
 		
 		int index = selectLeastLatency(devices_new, cloudlets, E, P);
 		this.final_cost = finalCost(cloudlets[index], cost);
+		this.final_coverage = coverage(cloudlets[index].clone(), devices_new[index], E, P);
 		System.out.println(index + ">" + Arrays.toString(cloudlets[index]) + " " + 
-		this.final_cost + " " + coverage(cloudlets[index].clone(), devices_new[index], E, P) + "\n"
+		this.final_cost + " " + this.final_coverage + "\n"
 		+ index + ">" + Arrays.toString(devices_new[index]) + " " + this.final_latency);
 		
 	}
@@ -509,5 +511,18 @@ public class GeneticCloudletPlacement {
 		
 		return dist;
 	}
+	
+	public int getCost() {
+		return this.final_cost;
+	}
+	
+	public double getLatency() {
+		return this.final_latency;
+	}
+	
+	public double getCoverage() {
+		return this.final_coverage;
+	}
+
 
 }
