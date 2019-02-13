@@ -13,7 +13,7 @@ public class RunGenetic {
 		//number of assignments in the algorithm seed set
 		int assignment_size = 5;
 		//threshold value for coverage, 50% for now
-		double threshold = 0.8;
+		double threshold = 0.5;
 		
 		ReadCSV reader = new ReadCSV();
 		int[][] cloudlet_specs = reader.getCloudlets(num_cloudlets);
