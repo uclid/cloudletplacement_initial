@@ -212,11 +212,16 @@ public class GeneticCloudletPlacement {
 		double min_dist = Double.MAX_VALUE;
 		for(int i = 0; i < cloudlets.length; i++) {
 			double sum_distance = 0;
-			for(int j = 0; j < devices_new.length; j++) {
+			for(int j = 0; j < devices_new[0].length; j++) {
 				int point_index = devices_new[i][j];
-				sum_distance += distance(P.get(point_index).xlocation, P.get(point_index).ylocation,
-						E.get(j).xlocation, E.get(j).ylocation);
+				if(cloudlets[i][point_index] != null) {
+					sum_distance = sum_distance + distance(P.get(point_index).xlocation, P.get(point_index).ylocation,
+							E.get(j).xlocation, E.get(j).ylocation);
+					//System.out.print(distance(P.get(point_index).xlocation, P.get(point_index).ylocation,
+							//E.get(j).xlocation, E.get(j).ylocation) + " ");
+				}
 			}
+			//System.out.println();
 			if(sum_distance < min_dist) {
 				min_dist = sum_distance;
 				this.final_latency = min_dist;
