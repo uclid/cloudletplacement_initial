@@ -197,7 +197,7 @@ public class GeneticCloudletPlacement {
 		devices_new = maximizeCover(devices, cloudlets, E, P);
 		//System.out.println(Arrays.toString(devices));
 		
-		int index = selectLeastLatency(devices_new, cloudlets, E, P);
+		int index = selectLeastLatency(devices_new, cloudlets, latency);
 		this.final_cost = finalCost(cloudlets[index], cost);
 		this.final_coverage = coverage(cloudlets[index].clone(), devices_new[index], E, P);
 		System.out.println(index + ">" + Arrays.toString(cloudlets[index]) + " " + 
@@ -206,30 +206,28 @@ public class GeneticCloudletPlacement {
 		
 	}
 
-	private int selectLeastLatency(int[][] devices_new, Cloudlet[][] cloudlets, ArrayList<EndDevice> E, ArrayList<CandidatePoint> P) {
+	private int selectLeastLatency(int[][] devices_new, Cloudlet[][] cloudlets, int[][] latency) {
 		// TODO Auto-generated method stub
-		int min_dist_index = 0;
-		double min_dist = Double.MAX_VALUE;
+		int min_latency_index = 0;
+		int min_latency = Integer.MAX_VALUE;
 		for(int i = 0; i < cloudlets.length; i++) {
-			double sum_distance = 0;
+			int sum_latency = 0;
 			for(int j = 0; j < devices_new[0].length; j++) {
 				int point_index = devices_new[i][j];
 				if(cloudlets[i][point_index] != null) {
-					sum_distance = sum_distance + distance(P.get(point_index).xlocation, P.get(point_index).ylocation,
-							E.get(j).xlocation, E.get(j).ylocation);
-					//System.out.print(distance(P.get(point_index).xlocation, P.get(point_index).ylocation,
-							//E.get(j).xlocation, E.get(j).ylocation) + " ");
+					sum_latency += latency[j][point_index];
+					//System.out.print(latency[j][point_index] + " ");
 				}
 			}
 			//System.out.println();
-			if(sum_distance < min_dist) {
-				min_dist = sum_distance;
-				this.final_latency = min_dist;
+			if(sum_latency < min_latency) {
+				min_latency = sum_latency;
+				this.final_latency = min_latency;
 				//System.out.println(min_dist);
-				min_dist_index = i;
+				min_latency_index = i;
 			}
 		}
-		return min_dist_index;
+		return min_latency_index;
 	}
 
 	private int[][] maximizeCover(int[] devices, Cloudlet[][] cloudlets, ArrayList<EndDevice> E,
