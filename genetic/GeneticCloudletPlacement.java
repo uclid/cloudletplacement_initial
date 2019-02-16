@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.PriorityQueue;
 import java.util.Random;
@@ -303,12 +304,22 @@ public class GeneticCloudletPlacement {
 			if(total_proc_demand >= C.get(counter).processor) {
 				//System.out.println(total_proc_demand + " " + C.get(counter).processor + " " + cost[C.get(counter).id - 1][0]);
 				total_proc_demand -= C.get(counter).processor;
-				estimate_optimal_cost += cost[C.get(counter).id - 1][0];
+				int min = Integer.MAX_VALUE;
+				for (int element : cost[C.get(counter).id - 1]) {
+				    min = Math.min(min, element);
+				}
+				//System.out.println(min);
+				estimate_optimal_cost += min;
 			}
 			else if(total_proc_demand > 0) {
 				//System.out.println(total_proc_demand + " " + C.get(counter).processor + " " + cost[C.get(counter).id - 1][0]);
 				total_proc_demand -= C.get(counter).processor;
-				estimate_optimal_cost += cost[C.get(counter).id - 1][0];
+				int min = Integer.MAX_VALUE;
+				for (int element : cost[C.get(counter).id - 1]) {
+				    min = Math.min(min, element);
+				}
+				//System.out.println(min);
+				estimate_optimal_cost += min;
 			}
 			counter--;
 		}
