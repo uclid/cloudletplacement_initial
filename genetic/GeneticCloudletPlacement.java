@@ -502,12 +502,18 @@ public class GeneticCloudletPlacement {
 		Cloudlet[][] cloudlets = new Cloudlet[m][n];
 		
 		while(m > 0) {
+			ArrayList<Integer> indexes = new ArrayList<Integer>();
+			for(int i = 0; i < n; i++) {
+				indexes.add(i);
+			}
 			for(Cloudlet c: C) {
 				Random rand = new Random();
-				int x = rand.nextInt(n);
-				
-				cloudlets[m-1][x] = c;	
+				int x = rand.nextInt(indexes.size());
+				//System.out.println(indexes.size() + " " + c.id);
+				cloudlets[m-1][indexes.get(x)] = c;
+				indexes.remove(x);
 			}
+			//System.out.println(Arrays.toString(cloudlets[m-1]));
 			m -= 1;
 		}
 		
