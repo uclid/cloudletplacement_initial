@@ -11,6 +11,16 @@ public class GeneticCloudletPlacement {
 	private int final_cost = 0;
 	private double final_latency = 0;
 	private double final_coverage = 0;
+	private int num_large = 0;
+	private int num_medium = 0;
+	private int num_small = 0;
+
+	public GeneticCloudletPlacement(int num_large, int num_medium, int num_small) {
+		// TODO Auto-generated constructor stub
+		this.num_large = num_large;
+		this.num_medium = num_medium;
+		this.num_small = num_small;
+	}
 
 	/**
 	 * @author Dixit Bhatta
@@ -94,7 +104,7 @@ public class GeneticCloudletPlacement {
 	
 				/*System.out.println("\nAfter Crossover, before mutation");
 				System.out.println("a1 " + Arrays.toString(a1)+ "= " + fitness(a1, cost));
-				System.out.println("a2 " + Arrays.toString(a1)+ "= " + fitness(a1, cost));*/
+				System.out.println("a2 " + Arrays.toString(a2)+ "= " + fitness(a2, cost));*/
 				
 				a1 = mutate(a1);
 				a2 = mutate(a2);
@@ -427,7 +437,7 @@ public class GeneticCloudletPlacement {
 	private Cloudlet[] mutate(Cloudlet[] A) {
 		// TODO Auto-generated method stub
 		Cloudlet[] mutated = A;
-		
+		//System.out.println("Mutate0 " + Arrays.toString(mutated));
 		for(int i = 0; i < A.length; i++) {
 			Random rand = new Random();
 			int x = rand.nextInt(10);
@@ -440,24 +450,78 @@ public class GeneticCloudletPlacement {
 				//System.out.println(y);
 				if(y == 0) {
 					mutated[i] = null;
+
 				}
 				else if(y == 1) {
-					//large cloudlet has id 5
-					mutated[i] = new Cloudlet(5, 200,200,200,3);
+					mutated[i] = new Cloudlet((this.num_large+this.num_medium+this.num_small), 200,200,200,3);
 				}
 				else if(y == 2) {
-					//medium cloudlet has id 2, 3 or 4
-					mutated[i] = new Cloudlet(4, 100,100,100,2);
+					mutated[i] = new Cloudlet((this.num_medium+this.num_small), 100,100,100,2);
 				}
 				else{
 					//small cloudlet has id 1
-					mutated[i] = new Cloudlet(1, 50,50,50,1);
+					mutated[i] = new Cloudlet(this.num_small, 50,50,50,1);
 				}
 			}
 			
 		}
 		
+		/*correct the cloudlet numbers if they 
+		became greater than available cloudlets 
+		it's possible after both crossover and mutation*/
+		int diff_small= cloudCount(mutated,"c3") - num_large;
+		int diff_medium= cloudCount(mutated,"c2") - num_medium;
+		int diff_large = cloudCount(mutated,"c1") - num_large;
+		/*if(cloudCount(mutated,"c3") == 0 && cloudCount(mutated,"c2") ==0 && cloudCount(mutated,"c1") == 0) {
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}*/
+		//System.out.println("Mutate1 " + Arrays.toString(mutated));
+		if(diff_small > 0) {
+			for(int i = 0, j = 0; i < diff_small; j++) {
+					if(mutated[j] != null && mutated[j].toString().equals("c3")) {
+						mutated[j] = null;
+						i++;
+					}
+			}
+		}
+		if(diff_medium > 0) {
+			for(int i = 0, j = 0; i < diff_medium; j++) {
+				if(mutated[j] != null && mutated[j].toString().equals("c2")) {
+					mutated[j] = null;
+					i++;
+				}
+			}
+		}
+		if(diff_large > 0) {
+			for(int i = 0, j = 0; i < diff_large; j++) {
+				if(mutated[j] != null && mutated[j].toString().equals("c1")) {
+					mutated[j] = null;
+					i++;
+				}
+			}
+		}
+		
+		//System.out.println("Mutate2 " + Arrays.toString(A));
+		
 		return mutated;
+	}
+
+	private int cloudCount(Cloudlet[] A, String string) {
+		// TODO Auto-generated method stub
+		int count = 0;
+		
+		for(Cloudlet a: A) {
+			if(a != null && a.toString().equals(string)) {
+				count++;
+			}
+		}
+		
+		return count;
 	}
 
 	private Cloudlet[][] crossOver(Cloudlet[] c1, Cloudlet[] c2) {

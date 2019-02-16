@@ -6,6 +6,12 @@ public class RunGenetic {
 		
 		//5 cloudlets as per our optimization example
 		int num_cloudlets = 5;
+		//number of large cloudlets
+		int num_large = 0;
+		//number of medium cloudlets
+		int num_medium = 0;
+		//nuumber of small cloudelts
+		int num_small = 0;
 		//25 end devices as per our optimization example
 		int num_devices = 25;
 		//7 candidate points as per our optimization example
@@ -25,6 +31,15 @@ public class RunGenetic {
 		for(int i = 0; i < cloudlet_specs.length; i++) {
 			cloudlets.add(new Cloudlet(cloudlet_specs[i][0], cloudlet_specs[i][1], 
 					cloudlet_specs[i][2], cloudlet_specs[i][3], cloudlet_specs[i][4]));
+			if(cloudlet_specs[i][1] == 200) {
+				num_large++;
+			}
+			else if(cloudlet_specs[i][1] == 100) {
+				num_medium++;
+			}
+			else {
+				num_small++;
+			}
 		}
 		
 		ArrayList<EndDevice> devices = new ArrayList<EndDevice>();
@@ -43,9 +58,11 @@ public class RunGenetic {
 		
 		//Latency Matrix
 		int[][] latency = reader.getLatencies(num_devices, num_candidates);
+		
+		//System.out.println(num_large + " " + num_medium + " " + num_small);
 	
 		long startTime = System.nanoTime();
-		GeneticCloudletPlacement place = new GeneticCloudletPlacement();
+		GeneticCloudletPlacement place = new GeneticCloudletPlacement(num_large, num_medium, num_small);
 		while(place.getCoverage() < 1.0)
 			place.geneticAlgorithm(cloudlets, points, devices, cost, latency, assignment_size, threshold);
 		long endTime = System.nanoTime();
