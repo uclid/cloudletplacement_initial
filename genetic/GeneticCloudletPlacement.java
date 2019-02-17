@@ -218,7 +218,9 @@ public class GeneticCloudletPlacement {
 		//System.out.println(Arrays.toString(devices));
 		
 		int index = selectLeastLatency(devices_new, cloudlets);
+		//int index = selectLeastCost(cloudlets);
 		this.final_cost = totalCost(cloudlets[index]);
+		//this.final_latency = totalLatency(devices_new[index], cloudlets[index]);
 		this.final_coverage = coverage(cloudlets[index].clone(), devices_new[index]);
 		System.out.println(index + ">" + Arrays.toString(cloudlets[index]) + " " + 
 		this.final_cost + " " + this.final_coverage + "\n"
@@ -437,7 +439,7 @@ public class GeneticCloudletPlacement {
 		return dist_from_total;
 	}
 	
-	/*private int selectLeastCost(Cloudlet[][] cloudlets) {
+	private int selectLeastCost(Cloudlet[][] cloudlets) {
 		// TODO Auto-generated method stub
 		int min_cost = Integer.MAX_VALUE;
 		int min_cost_index = 0;
@@ -452,7 +454,7 @@ public class GeneticCloudletPlacement {
 		}
 		
 		return min_cost_index;
-	}*/
+	}
 	
 	private int totalCost(Cloudlet[] b) {
 		// TODO Auto-generated method stub
