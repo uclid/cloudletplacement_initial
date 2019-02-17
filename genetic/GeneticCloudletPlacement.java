@@ -7,7 +7,13 @@ import java.util.Random;
 
 public class GeneticCloudletPlacement {
 
+	private ArrayList<Cloudlet> C = null;
+	private ArrayList<CandidatePoint> P = null;
+	private ArrayList<EndDevice> E = null;
+	private int[][] cost = {{}};
+	private int[][] latency = {{}};
 	private int estimate_optimal_cost = 0;
+	private int min_needed_cloudets = 0;
 	private int final_cost = 0;
 	private double final_latency = 0;
 	private double final_coverage = 0;
@@ -15,8 +21,14 @@ public class GeneticCloudletPlacement {
 	private int num_medium = 0;
 	private int num_small = 0;
 
-	public GeneticCloudletPlacement(int num_large, int num_medium, int num_small) {
+	public GeneticCloudletPlacement(ArrayList<Cloudlet> cloudlets, ArrayList<CandidatePoint> points, 
+			ArrayList<EndDevice> devices, int[][] cost, int[][] latency, int num_large, int num_medium, int num_small) {
 		// TODO Auto-generated constructor stub
+		this.C = cloudlets;
+		this.P = points;
+		this.E = devices;
+		this.cost = cost;
+		this.latency = latency;
 		this.num_large = num_large;
 		this.num_medium = num_medium;
 		this.num_small = num_small;
@@ -34,28 +46,26 @@ public class GeneticCloudletPlacement {
 	 * @param latency latency matrix
 	 * @param threshold 
 	 */
-	public void geneticAlgorithm(ArrayList<Cloudlet> C, ArrayList<CandidatePoint> P,
-			ArrayList<EndDevice> E, int[][] cost, int[][] latency, int assignment_size, double threshold) {
+	public void geneticAlgorithm(int assignment_size, double threshold) {
 		
-		int w = C.size();
 		int n = P.size();
 		int v = E.size();
 		int m = assignment_size;
 		HashMap<Cloudlet[], Double> cover_map = new HashMap<Cloudlet[], Double>();
 		
-		this.estimate_optimal_cost = estimateOptimal(C, E, cost);
+		this.estimate_optimal_cost = estimateOptimal();
 		//System.out.println(estimate_optimal_cost);
 		
 		//variable holding assignments for the cloudlets
 		Cloudlet[][] cloudlets = new Cloudlet[m][n];
-		cloudlets = randomAssignments(C, n, m);
+		cloudlets = randomAssignments(n, m);
 		//for(int i = 0; i < m; i++) {
 			//System.out.println(Arrays.toString(cloudlets[i]));
 		//}
 		
 		//variable holding assignment for devices
 		int[] devices = new int[v];
-		devices = deviceAssignments(P, E);
+		devices = deviceAssignments();
 		
 		//System.out.println(Arrays.toString(devices));
 		
@@ -67,7 +77,7 @@ public class GeneticCloudletPlacement {
 				pq.add(cloudlets[i]);
 			}
 			
-			while(B.size() <= m) {
+			while(B.size() <= 5) {
 				Cloudlet[] c1 = new Cloudlet[n];
 				Cloudlet[] c2 = new Cloudlet[n];
 				Cloudlet[] a1 = new Cloudlet[n];
@@ -115,10 +125,10 @@ public class GeneticCloudletPlacement {
 				System.out.println("c1 " + Arrays.toString(c1) + "= " + fitness(c1, cost));
 				System.out.println("c2 " + Arrays.toString(c2) + "= " + fitness(c2, cost));*/
 				
-				int c1_fit = fitness(c1, cost);
-				int c2_fit = fitness(c2, cost);
-				int a1_fit = fitness(a1, cost);
-				int a2_fit = fitness(a2, cost);
+				int c1_fit = fitness(c1);
+				int c2_fit = fitness(c2);
+				int a1_fit = fitness(a1);
+				int a2_fit = fitness(a2);
 				
 				int fC = Math.min(c1_fit, c2_fit);
 				int fA = Math.min(a1_fit, a2_fit);
@@ -131,10 +141,10 @@ public class GeneticCloudletPlacement {
 				System.out.println("c1 " + Arrays.toString(c1) + " = " + coverage(c1.clone(), devices, E, P));
 				System.out.println("c2 " + Arrays.toString(c2) + " = " + coverage(c2.clone(), devices, E, P));*/
 				
-				double c1_cover = coverage(c1.clone(), devices, E, P);
-				double c2_cover = coverage(c2.clone(), devices, E, P);
-				double a1_cover = coverage(a1.clone(), devices, E, P);
-				double a2_cover = coverage(a2.clone(), devices, E, P);
+				double c1_cover = coverage(c1.clone(), devices);
+				double c2_cover = coverage(c2.clone(), devices);
+				double a1_cover = coverage(a1.clone(), devices);
+				double a2_cover = coverage(a2.clone(), devices);
 				cover_map.put(c1, c1_cover);
 				cover_map.put(c2, c2_cover);
 				cover_map.put(a1, a1_cover);
@@ -153,11 +163,11 @@ public class GeneticCloudletPlacement {
 				System.out.println(Vc + " " + Va);
 				*/
 				
-				ArrayList<Cloudlet[]> population = 	new ArrayList<Cloudlet[]>();
+				/*ArrayList<Cloudlet[]> population = 	new ArrayList<Cloudlet[]>();
 				population.add(c1);
 				population.add(c2);
 				population.add(a1);
-				population.add(a2);
+				population.add(a2);*/
 				
 				//Cloudlet[] IF = fittest(population, cover_map, cost);
 				//cover_map.put(IF, coverage(IF.clone(), devices, E, P));
@@ -187,13 +197,13 @@ public class GeneticCloudletPlacement {
 					cover_map.remove(a1);
 					cover_map.remove(a2);
 				}
-				//System.out.println(B.toString());
-				Cloudlet[][] temp = new Cloudlet[B.size()][n];
-				for(int i = 0; i<B.size(); i++) {
-					temp[i] = B.get(i);
-				}
-				cloudlets = temp;
 			}
+			//System.out.println(B.toString());
+			Cloudlet[][] temp = new Cloudlet[B.size()][n];
+			for(int i = 0; i<B.size(); i++) {
+				temp[i] = B.get(i);
+			}
+			cloudlets = temp;
 			/*System.out.println("\nBest so far");
 			for(int i = 0; i<B.size(); i++) {
 				System.out.println(Arrays.toString(B.get(i)) + " " + fitness(B.get(i), cost) + " " + cover_map.get(B.get(i)));
@@ -203,25 +213,25 @@ public class GeneticCloudletPlacement {
 		
 		//System.out.println(Arrays.toString(devices));
 		
-		int[][] devices_new = new int[m][v];
-		devices_new = maximizeCover(devices, cloudlets, E, P);
+		int[][] devices_new = new int[cloudlets.length][v];
+		devices_new = maximizeCover(devices, cloudlets);
 		//System.out.println(Arrays.toString(devices));
 		
-		int index = selectLeastLatency(devices_new, cloudlets, latency);
-		this.final_cost = totalCost(cloudlets[index], cost);
-		this.final_coverage = coverage(cloudlets[index].clone(), devices_new[index], E, P);
+		int index = selectLeastLatency(devices_new, cloudlets);
+		this.final_cost = totalCost(cloudlets[index]);
+		this.final_coverage = coverage(cloudlets[index].clone(), devices_new[index]);
 		System.out.println(index + ">" + Arrays.toString(cloudlets[index]) + " " + 
 		this.final_cost + " " + this.final_coverage + "\n"
 		+ index + ">" + Arrays.toString(devices_new[index]) + " " + this.final_latency);
 		
 	}
 
-	private int selectLeastLatency(int[][] devices_new, Cloudlet[][] cloudlets, int[][] latency) {
+	private int selectLeastLatency(int[][] devices_new, Cloudlet[][] cloudlets) {
 		// TODO Auto-generated method stub
 		int min_latency_index = 0;
 		int min_latency = Integer.MAX_VALUE;
 		for(int i = 0; i < cloudlets.length; i++) {
-			int sum_latency = totalLatency(devices_new[i], cloudlets[i], latency);
+			int sum_latency = totalLatency(devices_new[i], cloudlets[i]);
 			//System.out.println();
 			if(sum_latency < min_latency) {
 				min_latency = sum_latency;
@@ -233,7 +243,7 @@ public class GeneticCloudletPlacement {
 		return min_latency_index;
 	}
 	
-	private int totalLatency(int[] devices, Cloudlet[] cloudlets, int[][] latency) {
+	private int totalLatency(int[] devices, Cloudlet[] cloudlets) {
 		// TODO Auto-generated method stub
 		int sum_latency = 0;
 		for(int j = 0; j < devices.length; j++) {
@@ -246,8 +256,7 @@ public class GeneticCloudletPlacement {
 		return sum_latency;
 	}
 
-	private int[][] maximizeCover(int[] devices, Cloudlet[][] cloudlets, ArrayList<EndDevice> E,
-			ArrayList<CandidatePoint> P) {
+	private int[][] maximizeCover(int[] devices, Cloudlet[][] cloudlets) {
 		// TODO Auto-generated method stub
 		int[][] devices_new = new int[cloudlets.length][E.size()];
 		
@@ -274,16 +283,16 @@ public class GeneticCloudletPlacement {
 					double min_dist = Double.MAX_VALUE;
 					int min_dist_index = index;
 					for(int k = 0; k < cloudlets[i].length; k++) {
-						if(cloudlets[i][k] != null && inRangeAndCapacity(k, processor, memory, storage, cloudlets[i][k], E.get(j), P)) {
+						if(cloudlets[i][k] != null && inRangeAndCapacity(k, processor, memory, storage, cloudlets[i][k], E.get(j))) {
 							double d = distance(P.get(k).xlocation, P.get(k).ylocation,
 									E.get(j).xlocation, E.get(j).ylocation);
 							if(d < min_dist) {
 								min_dist = d;
 								min_dist_index = k;
 							}
-							processor[k] -= E.get(i).processor;
-							memory[k] -= E.get(i).memory;
-							storage[k] -= E.get(i).storage;
+							processor[k] -= E.get(j).processor;
+							memory[k] -= E.get(j).memory;
+							storage[k] -= E.get(j).storage;
 						}
 					}
 					devices_new[i][j] = min_dist_index;
@@ -304,10 +313,11 @@ public class GeneticCloudletPlacement {
 		return true;
 	}
 
-	private int estimateOptimal(ArrayList<Cloudlet> C, ArrayList<EndDevice> E, int[][] cost) {
+	private int estimateOptimal() {
 		// TODO Auto-generated method stub
 		int total_proc_demand = 0;
 		int estimate_optimal_cost = 0;
+		this.min_needed_cloudets = 0;
 		
 		for(EndDevice e: E) {
 			total_proc_demand += e.processor;
@@ -325,6 +335,7 @@ public class GeneticCloudletPlacement {
 				}
 				//System.out.println(min);
 				estimate_optimal_cost += min;
+				this.min_needed_cloudets++;
 			}
 			else if(total_proc_demand > 0) {
 				//System.out.println(total_proc_demand + " " + C.get(counter).processor + " " + cost[C.get(counter).id - 1][0]);
@@ -335,6 +346,7 @@ public class GeneticCloudletPlacement {
 				}
 				//System.out.println(min);
 				estimate_optimal_cost += min;
+				this.min_needed_cloudets++;
 			}
 			counter--;
 		}
@@ -360,7 +372,7 @@ public class GeneticCloudletPlacement {
 		return best;
 	}*/
 
-	private double coverage(Cloudlet[] c1, int[] devices, ArrayList<EndDevice> E, ArrayList<CandidatePoint> P) {
+	private double coverage(Cloudlet[] c1, int[] devices) {
 		// TODO Auto-generated method stub
 		double coverage = 0;
 		int[] processor = {0,0,0,0,0,0,0};
@@ -381,7 +393,7 @@ public class GeneticCloudletPlacement {
 		for(int i = 0; i < devices.length; i++) {
 			int point = devices[i];
 			if(c1[point] != null) {
-				if(inRangeAndCapacity(point, processor, storage, memory, c1[point], E.get(i), P)) {
+				if(inRangeAndCapacity(point, processor, storage, memory, c1[point], E.get(i))) {
 					coverage++;
 					//System.out.println(processor[point] + " - " + c1[point].processor);
 					processor[point] -= E.get(i).processor;
@@ -394,8 +406,7 @@ public class GeneticCloudletPlacement {
 		return coverage/E.size();
 	}
 	
-	private boolean inRangeAndCapacity(int point, int[] processor, int[] storage, int[] memory, Cloudlet c1, EndDevice endDevice,
-			ArrayList<CandidatePoint> P) {
+	private boolean inRangeAndCapacity(int point, int[] processor, int[] storage, int[] memory, Cloudlet c1, EndDevice endDevice) {
 		// TODO Auto-generated method stub
 		double d = distance(P.get(point).xlocation, P.get(point).ylocation,
 				endDevice.xlocation, endDevice.ylocation);
@@ -411,7 +422,7 @@ public class GeneticCloudletPlacement {
 		return false;
 	}
 
-	private int fitness(Cloudlet[] b, int[][] cost) {
+	private int fitness(Cloudlet[] b) {
 		// TODO Auto-generated method stub
 		int total_cost = 0;
 		
@@ -426,13 +437,13 @@ public class GeneticCloudletPlacement {
 		return dist_from_total;
 	}
 	
-	/*private int selectLeastCost(Cloudlet[][] cloudlets, int[][] cost) {
+	/*private int selectLeastCost(Cloudlet[][] cloudlets) {
 		// TODO Auto-generated method stub
 		int min_cost = Integer.MAX_VALUE;
 		int min_cost_index = 0;
 		
 		for(int i = 0; i < cloudlets.length; i++) {
-			int sum_cost = totalCost(cloudlets[i], cost);
+			int sum_cost = totalCost(cloudlets[i]);
 			if(sum_cost < min_cost) {
 				min_cost = sum_cost;
 				this.final_cost = min_cost;
@@ -443,7 +454,7 @@ public class GeneticCloudletPlacement {
 		return min_cost_index;
 	}*/
 	
-	private int totalCost(Cloudlet[] b, int[][] cost) {
+	private int totalCost(Cloudlet[] b) {
 		// TODO Auto-generated method stub
 		int total_cost = 0;
 		
@@ -488,13 +499,20 @@ public class GeneticCloudletPlacement {
 			
 		}
 		
+		mutated = validate(mutated);
+		//System.out.println("Mutate2 " + Arrays.toString(A));
+		
+		return mutated;
+	}
+	
+	private Cloudlet[] validate(Cloudlet[] C) {
 		/*correct the cloudlet numbers if they 
 		became greater than available cloudlets 
 		it's possible after both crossover and mutation*/
-		int diff_small= cloudCount(mutated,"c3") - num_large;
-		int diff_medium= cloudCount(mutated,"c2") - num_medium;
-		int diff_large = cloudCount(mutated,"c1") - num_large;
-		/*if(cloudCount(mutated,"c3") == 0 && cloudCount(mutated,"c2") ==0 && cloudCount(mutated,"c1") == 0) {
+		int diff_small= cloudCount(C,"c3") - num_large;
+		int diff_medium= cloudCount(C,"c2") - num_medium;
+		int diff_large = cloudCount(C,"c1") - num_large;
+		/*if(cloudCount(C,"c3") == 0 && cloudCount(C,"c2") ==0 && cloudCount(C,"c1") == 0) {
 			try {
 				Thread.sleep(2000);
 			} catch (InterruptedException e) {
@@ -502,35 +520,34 @@ public class GeneticCloudletPlacement {
 				e.printStackTrace();
 			}
 		}*/
-		//System.out.println("Mutate1 " + Arrays.toString(mutated));
+		//System.out.println("Mutate1 " + Arrays.toString(C));
 		if(diff_small > 0) {
 			for(int i = 0, j = 0; i < diff_small; j++) {
-					if(mutated[j] != null && mutated[j].toString().equals("c3")) {
-						mutated[j] = null;
+					if(C[j] != null && C[j].toString().equals("c3")) {
+						C[j] = null;
 						i++;
 					}
 			}
 		}
 		if(diff_medium > 0) {
 			for(int i = 0, j = 0; i < diff_medium; j++) {
-				if(mutated[j] != null && mutated[j].toString().equals("c2")) {
-					mutated[j] = null;
+				if(C[j] != null && C[j].toString().equals("c2")) {
+					C[j] = null;
 					i++;
 				}
 			}
 		}
 		if(diff_large > 0) {
 			for(int i = 0, j = 0; i < diff_large; j++) {
-				if(mutated[j] != null && mutated[j].toString().equals("c1")) {
-					mutated[j] = null;
+				if(C[j] != null && C[j].toString().equals("c1")) {
+					C[j] = null;
 					i++;
 				}
 			}
 		}
 		
-		//System.out.println("Mutate2 " + Arrays.toString(A));
+		return C;
 		
-		return mutated;
 	}
 
 	private int cloudCount(Cloudlet[] A, String string) {
@@ -563,15 +580,13 @@ public class GeneticCloudletPlacement {
 		return crossed;
 	}
 
-	private int[] deviceAssignments(ArrayList<CandidatePoint> P, ArrayList<EndDevice> E) {
-		int n = P.size();
-		int v = E.size();
+	private int[] deviceAssignments() {
 		
-		int[] devices = new int[v];
-		for(int i = 0; i < v; i++) {
+		int[] devices = new int[E.size()];
+		for(int i = 0; i < E.size(); i++) {
 			double min_dist = Double.MAX_VALUE;
 			int min_dist_index = 0;
-			for(int j = 0; j < n; j++) {
+			for(int j = 0; j < P.size(); j++) {
 				double d = distance(E.get(i).xlocation, E.get(i).ylocation, P.get(j).xlocation, P.get(j).ylocation);
 				if(d < min_dist) {
 					min_dist = d;
@@ -583,7 +598,7 @@ public class GeneticCloudletPlacement {
 		return devices;
 	}
 
-	private Cloudlet[][] randomAssignments(ArrayList<Cloudlet> C, int n, int m) {
+	private Cloudlet[][] randomAssignments(int n, int m) {
 		// TODO Auto-generated method stub
 		Cloudlet[][] cloudlets = new Cloudlet[m][n];
 		
@@ -606,7 +621,7 @@ public class GeneticCloudletPlacement {
 		return cloudlets;
 	}
 	
-	/*private Cloudlet[][] randomAssignments(ArrayList<Cloudlet> C, int n, int m) {
+	/*private Cloudlet[][] randomAssignments(int n, int m) {
 		// TODO Auto-generated method stub
 		Cloudlet[][] cloudlets = new Cloudlet[m][n];
 		
@@ -615,7 +630,7 @@ public class GeneticCloudletPlacement {
 			for(int i = 0; i < n; i++) {
 				indexes.add(i);
 			}
-			for(int j = C.size()-1; j >= 2; j--) {
+			for(int j = C.size()-1; j >= (this.min_needed_cloudets - 1); j--) {
 				Random rand = new Random();
 				int x = rand.nextInt(indexes.size());
 				//System.out.println(indexes.size() + " " + c.id);
