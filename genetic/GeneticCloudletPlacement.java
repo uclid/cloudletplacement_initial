@@ -576,8 +576,8 @@ public class GeneticCloudletPlacement {
 			c2[i] = buffer;
 		}
 		
-		crossed[0] = c1;
-		crossed[1] = c2;
+		crossed[0] = validate(c1.clone());
+		crossed[1] = validate(c2.clone());
 		
 		return crossed;
 	}
