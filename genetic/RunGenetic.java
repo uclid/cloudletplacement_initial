@@ -64,8 +64,8 @@ public class RunGenetic {
 		long startTime = System.nanoTime();
 		GeneticCloudletPlacement place = new GeneticCloudletPlacement(cloudlets, points, devices, cost, latency,
 				num_large, num_medium, num_small);
-		while(place.getCoverage() < 1.0)
-			place.geneticAlgorithm(assignment_size, threshold);
+		
+		place.geneticAlgorithm(assignment_size, threshold);
 		long endTime = System.nanoTime();
 		
 		long duration = (endTime - startTime)/1000000;
