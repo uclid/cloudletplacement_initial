@@ -54,7 +54,7 @@ public class GeneticCloudletPlacement {
 		HashMap<Cloudlet[], Double> cover_map = new HashMap<Cloudlet[], Double>();
 		
 		this.estimate_optimal_cost = estimateOptimal();
-		//System.out.println(estimate_optimal_cost);
+		System.out.println(estimate_optimal_cost);
 		
 		//variable holding assignments for the cloudlets
 		Cloudlet[][] cloudlets = new Cloudlet[m][n];
@@ -68,7 +68,7 @@ public class GeneticCloudletPlacement {
 		devices = deviceAssignments();
 		
 		//System.out.println(Arrays.toString(devices));
-		while(this.final_coverage < 1.0) {
+		while(this.final_coverage < 0.5) {
 			//enclose this in while underThreshold()
 			do {
 				ArrayList<Cloudlet[]> B = new ArrayList<Cloudlet[]>();
@@ -265,9 +265,9 @@ public class GeneticCloudletPlacement {
 		for(int i = 0; i < cloudlets.length; i++) {
 			devices_new[i] = devices.clone();
 			//System.out.println("->" + Arrays.toString(devices_new[i]));
-			int[] processor = {0,0,0,0,0,0,0};
-			int[] memory = {0,0,0,0,0,0,0};
-			int[] storage = {0,0,0,0,0,0,0};
+			int[] processor = new int[cloudlets[i].length];
+			int[] memory = new int[cloudlets[i].length];
+			int[] storage = new int[cloudlets[i].length];
 			
 			//copy of the cloudlet specifications so that
 			//they do get reset for next coverage maximization
@@ -318,68 +318,77 @@ public class GeneticCloudletPlacement {
 	private int estimateOptimal() {
 		// TODO Auto-generated method stub
 		int total_proc_demand = 0;
+		int total_mem_demand = 0;
+		int total_stor_demand = 0;
 		int estimate_optimal_cost = 0;
 		this.min_needed_cloudets = 0;
 		
 		for(EndDevice e: E) {
 			total_proc_demand += e.processor;
+			total_mem_demand += e.memory;
+			total_stor_demand += e.storage;
 		}
 		
-		int counter = C.size()-1;
+		int[] estimated_all = new int[3];
+		estimated_all[0] = estimateByType(total_proc_demand, 'p');
+		estimated_all[1] = estimateByType(total_mem_demand, 'm');
+		estimated_all[2] = estimateByType(total_stor_demand, 's');
+		estimate_optimal_cost = Math.max(estimated_all[0], Math.max(estimated_all[1], estimated_all[2]));
+		//System.out.println(estimated_all[0]+ " " + Math.max(estimated_all[1], estimated_all[2]));
+		
+		return estimate_optimal_cost;
+	}
 
+	private int estimateByType(int total_demand, char type) {
+		// TODO Auto-generated method stub
+		int optimal_for_type = 0;
+		int counter = C.size()-1;
+		int capacity = 0;
+		
 		while(counter >= 0) {
-			if(total_proc_demand >= C.get(counter).processor) {
+			if(type == 'p') {
+				capacity = C.get(counter).processor;
+			}
+			else if(type == 'm') {
+				capacity = C.get(counter).memory;
+			}
+			else if(type == 's') {
+				capacity = C.get(counter).storage;
+			}
+			if(total_demand >= capacity) {
 				//System.out.println(total_proc_demand + " " + C.get(counter).processor + " " + cost[C.get(counter).id - 1][0]);
-				total_proc_demand -= C.get(counter).processor;
-				int min = Integer.MAX_VALUE;
+				total_demand -= capacity;
+				int min_val = Integer.MAX_VALUE;
 				for (int element : cost[C.get(counter).id - 1]) {
-				    min = Math.min(min, element);
+				    min_val = Math.min(min_val, element);
 				}
-				//System.out.println(min);
-				estimate_optimal_cost += min;
+				//System.out.println(min_val);
+				optimal_for_type  += min_val;
 				this.min_needed_cloudets++;
 			}
-			else if(total_proc_demand > 0) {
+			else if(total_demand > 0) {
 				//System.out.println(total_proc_demand + " " + C.get(counter).processor + " " + cost[C.get(counter).id - 1][0]);
-				total_proc_demand -= C.get(counter).processor;
-				int min = Integer.MAX_VALUE;
+				total_demand -= capacity;
+				int min_val = Integer.MAX_VALUE;
 				for (int element : cost[C.get(counter).id - 1]) {
-				    min = Math.min(min, element);
+				    min_val = Math.min(min_val, element);
 				}
-				//System.out.println(min);
-				estimate_optimal_cost += min;
+				//System.out.println(min_val);
+				optimal_for_type  += min_val;
 				this.min_needed_cloudets++;
 			}
 			counter--;
 		}
 		
-		return estimate_optimal_cost;
+		return optimal_for_type;
 	}
-
-	/*private Cloudlet[] fittest(ArrayList<Cloudlet[]> population, HashMap<Cloudlet[], Double> cover_map, int[][] cost) {
-		// TODO Auto-generated method stub
-		Cloudlet[] best = population.get(0);
-		
-		for(int i = 1; i < population.size(); i++) {
-			if(fitness(population.get(i), cost) < fitness(best, cost) ) {
-				best = population.get(i);
-			}
-			else if(fitness(population.get(i), cost) == fitness(best, cost)) {
-				if(cover_map.get(population.get(i)) > cover_map.get(best)) {
-					best = population.get(i);
-				}
-			}
-		}
-		
-		return best;
-	}*/
 
 	private double coverage(Cloudlet[] c1, int[] devices) {
 		// TODO Auto-generated method stub
 		double coverage = 0;
-		int[] processor = {0,0,0,0,0,0,0};
-		int[] memory = {0,0,0,0,0,0,0};
-		int[] storage = {0,0,0,0,0,0,0};
+		int[] processor = new int[c1.length];
+		int[] memory = new int[c1.length];
+		int[] storage = new int[c1.length];
 		
 		//copy of the cloudlet specifications so that
 		//they do get reset for next coverage calculation
