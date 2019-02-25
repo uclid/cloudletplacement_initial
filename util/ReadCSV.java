@@ -9,7 +9,7 @@ public class ReadCSV {
     	//cloudlet specifications have 4 fields
     	int[][] cloudlet_specs = new int[num_cloudlets][5];
     	
-    	String csvFile = "data-files/example/example_cloudlet.csv";
+    	String csvFile = "data-files/central_harlem/central_cloudlet.csv";
         String line = "";
         String cvsSplitBy = ",";
 
@@ -40,7 +40,7 @@ public class ReadCSV {
     	//device specifications have 5 fields
     	int[][] device_specs = new int[num_devices][6];
     	
-    	String csvFile = "data-files/example/example_device.csv";
+    	String csvFile = "data-files/central_harlem/central_device.csv";
         String line = "";
         String cvsSplitBy = ",";
 
@@ -72,7 +72,7 @@ public class ReadCSV {
     	//device specifications have 5 fields
     	int[][] cand_points = new int[num_candidates][3];
     	
-    	String csvFile = "data-files/example/example_points.csv";
+    	String csvFile = "data-files/central_harlem/central_points_10.csv";
         String line = "";
         String cvsSplitBy = ",";
 
@@ -101,7 +101,7 @@ public class ReadCSV {
     	//device specifications have 5 fields
     	int[][] costs = new int[num_cloudlets][num_candidates];
     	
-    	String csvFile = "data-files/example/example_costs.csv";
+    	String csvFile = "data-files/central_harlem/central_costs_10.csv";
         String line = "";
         String cvsSplitBy = ",";
 
@@ -129,7 +129,7 @@ public class ReadCSV {
     	//device specifications have 5 fields
     	int[][] latency = new int[num_devices][num_candidates];
     	
-    	String csvFile = "data-files/example/example_latencies.csv";
+    	String csvFile = "data-files/central_harlem/central_latencies_10.csv";
         String line = "";
         String cvsSplitBy = ",";
 

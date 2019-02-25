@@ -190,7 +190,7 @@ public class CplexCloudletPlacement {
 			if(isSolved) {
 				double objValue = model.getObjValue();
 				System.out.println("\nObjective value is: " + objValue);
-				System.out.print("\nCloudlet Assignments\n");
+				/*System.out.print("\nCloudlet Assignments\n");
 				for(int j = 0; j < w; j++) {
 					for(int k=0; k < n; k++) {
 						System.out.print(" y[" + j + "][" + k + "] = " + model.getValue(y[j][k]));
@@ -203,7 +203,7 @@ public class CplexCloudletPlacement {
 						System.out.print(" a[" + i + "][" + k + "] = " + model.getValue(a[i][k]));
 					}
 					System.out.println("\n");
-				}
+				}*/
 				
 			}
 			else {

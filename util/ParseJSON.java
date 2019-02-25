@@ -2,8 +2,11 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 import org.json.*;
 
@@ -17,24 +20,87 @@ public class ParseJSON {
 		JSONArray array = obj.getJSONArray("data");
 		
 		int counter = 0;
+		Set<String> myWiFi = new HashSet<String>();
+		ArrayList<Double> myWiFiLat = new ArrayList<Double>();
+		ArrayList<Double> myWiFiLon = new ArrayList<Double>();
 		for(int i = 0; i < array.length(); i++) {
 			String item = array.get(i).toString();
 			//tokenize by splitting with commas except when enclosed by quotes
 			String[] tokens = item.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
 			if(item.contains("Central Harlem")) {
 				System.out.println(item);
-				System.out.println(tokens[14] + " " + tokens[16]);
+				//System.out.println(tokens[14] + " " + tokens[16]);
+				myWiFi.add(tokens[14] + " " + tokens[16]);
 				counter++;
 			}
 		}
 		System.out.println("Total " + counter);
+		System.out.println("Total Set " + myWiFi.size());
+		
+		for(String s: myWiFi) {
+			String[] xy = s.split(" ");
+			double n = Double.parseDouble(xy[0].replaceAll("^\"|\"$", ""));
+			double m = Double.parseDouble(xy[1].replaceAll("^\"|\"$", ""));
+			myWiFiLat.add(n);
+			myWiFiLon.add(m);
+			//System.out.println(n + " " + m);
+		}
+		
+		double max_x = Collections.max(myWiFiLon);
+		double min_x = Collections.min(myWiFiLon);
+		double max_y = Collections.max(myWiFiLat);
+		double min_y = Collections.min(myWiFiLat);
+		ArrayList<Double> x = new ArrayList<Double>();
+		ArrayList<Double> y = new ArrayList<Double>();
+		
+		//find the range ratio of x to y
+		System.out.println((max_x-min_x)/(max_y-min_y));
+		
+		//found it to be roughly 70:100 for Central Harlem
+		//the smallest grid with as many at least 183 points
+		//and this ratio is 14x20
+		for(Double longitude:myWiFiLon) {
+			x.add(14*(longitude - min_x)/(max_x - min_x));
+		}
+		
+		for(Double latitude:myWiFiLat) {
+			y.add(20*(latitude - min_y)/(max_y - min_y));
+		}
+		
+		Set<String> final_coords = new HashSet<String>();
+		for(int i = 0; i < myWiFiLon.size(); i++) {
+			System.out.println((i+1) + " " + myWiFiLon.get(i) + " " + myWiFiLat.get(i));
+			System.out.println((i+1) + " " + Math.round(x.get(i)) + " " + Math.round(y.get(i)));
+			final_coords.add(Math.round(x.get(i)) + " " + Math.round(y.get(i)));
+		}
+		System.out.println(final_coords.size());
+		
 		
 		//generate uninformly distributed indexes based on total points
 		//divide counter to get the desired percentage of candidate points
-		//candidate points are 20%, 30%, 40%, 50%
+		//candidate points are 10%, 20%, 30%, 40%, 50%
+		int points = myWiFi.size()/10;
+		int xrange = 14;
+		int yrange = 20;
 		Random rand = new Random();
-		for(int i = 0; i < counter/5; i++) {
-			System.out.println(rand.nextInt(counter));
+		System.out.println("------------------------------------");
+		for(int i = 0; i < points; i++) {
+			System.out.println(rand.nextInt(xrange+1));
+		}
+		System.out.println("------------------------------------");
+		for(int i = 0; i < points; i++) {
+			System.out.println(rand.nextInt(yrange+1));
+		}
+		
+		//unform random locations for n devices
+		int n = 343;
+		System.out.println("------------------------------------");
+		for(int i = 0; i < n; i++) {
+			System.out.println(rand.nextInt(xrange+1));
+		}
+		System.out.println("------------------------------------");
+		for(int i = 0; i < n; i++) {
+			System.out.println(rand.nextInt(yrange+1));
 		}
 		
 		/*
@@ -50,6 +116,12 @@ public class ParseJSON {
 		 * East Harlem was at 120,000 (1.46%)
 		 * */
 		
+		/* Unique WiFi Hotspot locations
+		 * Central Harlem 183
+		 * West Harlem (Manhattanville and Hamilton Heights) 2 +  19 + 58 = 79
+		 * East Harlem 81
+		 * */
+		
 		/* LinkNYC Usage data
 		 * https://data.cityofnewyork.us/resource/69wu-b929.json
 		 * 2019, about 686,697 per week
@@ -59,13 +131,19 @@ public class ParseJSON {
 		 * East Harlem ~ 10,025 per week ~ 1432 per day
 		 * */
 		
-		/* Num cloudlets = 15% of total points
-		 * large = 20% of total cloudlets
-		 * medium = 40% of total cloudlets
-		 * small = 20% of total cloudlets
-		 * Num devices = 125% of total points
-		 * high demand = 55% of total devices
-		 * low demand = 45% of total devices 
+		/* Num cloudlets = 1% of per day usage
+		 * large = 20% of num cloudlets
+		 * medium = 40% of num cloudlets
+		 * small = 20% of num cloudlets
+		 * Num devices = 25% of per day usage
+		 * high demand = 50% of num devices
+		 * low demand = 50% of num devices
+		 * Cloud specs: 200, 400, 600 -> c3, c2, c1
+		 * Device specs: 20, 10 -> high, low
+		 * */
+		
+		/*Some refs
+		 * https://www.cs.cmu.edu/~satya/docdir/satya-ieeepvc-cloudlets-2009.pdf
 		 * */
 		
 

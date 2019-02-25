@@ -5,7 +5,7 @@ public class RunGenetic {
 	public static void main(String[] args){
 		
 		//5 cloudlets as per our optimization example
-		int num_cloudlets = 5;
+		int num_cloudlets = 14;
 		//number of large cloudlets
 		int num_large = 0;
 		//number of medium cloudlets
@@ -13,11 +13,11 @@ public class RunGenetic {
 		//nuumber of small cloudelts
 		int num_small = 0;
 		//25 end devices as per our optimization example
-		int num_devices = 25;
+		int num_devices = 343;
 		//7 candidate points as per our optimization example
-		int num_candidates = 7;
+		int num_candidates = 18;
 		//number of assignments in the algorithm seed set
-		int assignment_size = 15;
+		int assignment_size = 45;
 		//threshold value for coverage, 50% for now
 		double threshold = 0.1;
 		
@@ -31,10 +31,10 @@ public class RunGenetic {
 		for(int i = 0; i < cloudlet_specs.length; i++) {
 			cloudlets.add(new Cloudlet(cloudlet_specs[i][0], cloudlet_specs[i][1], 
 					cloudlet_specs[i][2], cloudlet_specs[i][3], cloudlet_specs[i][4]));
-			if(cloudlet_specs[i][1] == 200) {
+			if(cloudlet_specs[i][1] == 600) {
 				num_large++;
 			}
-			else if(cloudlet_specs[i][1] == 100) {
+			else if(cloudlet_specs[i][1] == 400) {
 				num_medium++;
 			}
 			else {

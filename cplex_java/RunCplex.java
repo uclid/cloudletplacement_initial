@@ -5,11 +5,11 @@ public class RunCplex {
 	public static void main(String[] args){
 		
 		//5 cloudlets as per our optimization example
-		int num_cloudlets = 5;
+		int num_cloudlets = 14;
 		//25 end devices as per our optimization example
-		int num_devices = 25;
+		int num_devices = 343;
 		//7 candidate points as per our optimization example
-		int num_candidates = 7;
+		int num_candidates = 18;
 		
 		ReadCSV reader = new ReadCSV();
 		int[][] cloudlet_specs = reader.getCloudlets(num_cloudlets);

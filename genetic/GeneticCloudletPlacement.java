@@ -54,7 +54,7 @@ public class GeneticCloudletPlacement {
 		HashMap<Cloudlet[], Double> cover_map = new HashMap<Cloudlet[], Double>();
 		
 		this.estimate_optimal_cost = estimateOptimal();
-		//System.out.println(estimate_optimal_cost);
+		System.out.println(estimate_optimal_cost);
 		
 		//variable holding assignments for the cloudlets
 		Cloudlet[][] cloudlets = new Cloudlet[m][n];
@@ -68,7 +68,7 @@ public class GeneticCloudletPlacement {
 		devices = deviceAssignments();
 		
 		//System.out.println(Arrays.toString(devices));
-		while(this.final_coverage < 1.0) {
+		while(this.final_coverage < 0.5) {
 			//enclose this in while underThreshold()
 			do {
 				ArrayList<Cloudlet[]> B = new ArrayList<Cloudlet[]>();
@@ -265,9 +265,9 @@ public class GeneticCloudletPlacement {
 		for(int i = 0; i < cloudlets.length; i++) {
 			devices_new[i] = devices.clone();
 			//System.out.println("->" + Arrays.toString(devices_new[i]));
-			int[] processor = {0,0,0,0,0,0,0};
-			int[] memory = {0,0,0,0,0,0,0};
-			int[] storage = {0,0,0,0,0,0,0};
+			int[] processor = new int[cloudlets[i].length];
+			int[] memory = new int[cloudlets[i].length];
+			int[] storage = new int[cloudlets[i].length];
 			
 			//copy of the cloudlet specifications so that
 			//they do get reset for next coverage maximization
@@ -386,9 +386,9 @@ public class GeneticCloudletPlacement {
 	private double coverage(Cloudlet[] c1, int[] devices) {
 		// TODO Auto-generated method stub
 		double coverage = 0;
-		int[] processor = {0,0,0,0,0,0,0};
-		int[] memory = {0,0,0,0,0,0,0};
-		int[] storage = {0,0,0,0,0,0,0};
+		int[] processor = new int[c1.length];
+		int[] memory = new int[c1.length];
+		int[] storage = new int[c1.length];
 		
 		//copy of the cloudlet specifications so that
 		//they do get reset for next coverage calculation
