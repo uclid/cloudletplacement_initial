@@ -66,166 +66,207 @@ public class GeneticCloudletPlacement {
 		//variable holding assignment for devices
 		int[] devices = new int[v];
 		devices = deviceAssignments();
+		//int null_counter = 0;
 		
 		//System.out.println(Arrays.toString(devices));
-		while(this.final_coverage < 0.5) {
-			//enclose this in while underThreshold()
-			do {
-				ArrayList<Cloudlet[]> B = new ArrayList<Cloudlet[]>();
-				PriorityQueue<Cloudlet[]> pq = new PriorityQueue<Cloudlet[]>(cloudlets.length, new AssignmentsComparator(cost));
-				for(int i = 0; i < cloudlets.length; i++) {
-					pq.add(cloudlets[i]);
-				}
+		do {
+			ArrayList<Cloudlet[]> B = new ArrayList<Cloudlet[]>();
+			PriorityQueue<Cloudlet[]> pq = new PriorityQueue<Cloudlet[]>(cloudlets.length, new AssignmentsComparator(cost));
+			for(int i = 0; i < cloudlets.length; i++) {
+				pq.add(cloudlets[i]);
+			}
+			
+			while(B.size() <= 10) {
+				Cloudlet[] c1 = new Cloudlet[n];
+				Cloudlet[] c2 = new Cloudlet[n];
+				Cloudlet[] a1 = new Cloudlet[n];
+				Cloudlet[] a2 = new Cloudlet[n];
 				
-				while(B.size() <= 5) {
-					Cloudlet[] c1 = new Cloudlet[n];
-					Cloudlet[] c2 = new Cloudlet[n];
-					Cloudlet[] a1 = new Cloudlet[n];
-					Cloudlet[] a2 = new Cloudlet[n];
-					
-					if(!pq.isEmpty()) {
-						c1 = pq.remove();
-					}
-					if(!pq.isEmpty()) {
-						c2 = pq.remove();
-					}
-					//System.out.println(Arrays.toString(pq.remove()));
-					
-					
-					//for crossover probability
-					Random rand = new Random();
-					int x = rand.nextInt(10);
-					//System.out.println(x);
-					
-					/*System.out.println("Before Crossover");
-					System.out.println("c1 " + Arrays.toString(c1) + "= " + fitness(c1, cost));
-					System.out.println("c2 " + Arrays.toString(c2) + "= " + fitness(c2, cost));*/
-					
-					//crossover probability is 0.5 for now
-					if(x >= 5) {
-						//System.out.println("Crossover happend!");
-						a1 = crossOver(c1.clone(),c2.clone())[0];
-						a2 = crossOver(c1.clone(),c2.clone())[1];
-					}
-					else {
-						a1 = c1.clone();
-						a2 = c2.clone();
-					}
-		
-					/*System.out.println("\nAfter Crossover, before mutation");
-					System.out.println("a1 " + Arrays.toString(a1)+ "= " + fitness(a1, cost));
-					System.out.println("a2 " + Arrays.toString(a2)+ "= " + fitness(a2, cost));*/
-					
-					a1 = mutate(a1);
-					a2 = mutate(a2);
-					
-					/*System.out.println("\nAfter mutation");
-					System.out.println("a1 " + Arrays.toString(a1)+ "= " + fitness(a1, cost));
-					System.out.println("a2 " + Arrays.toString(a2)+ "= " + fitness(a2, cost));
-					System.out.println("c1 " + Arrays.toString(c1) + "= " + fitness(c1, cost));
-					System.out.println("c2 " + Arrays.toString(c2) + "= " + fitness(c2, cost));*/
-					
-					int c1_fit = fitness(c1);
-					int c2_fit = fitness(c2);
-					int a1_fit = fitness(a1);
-					int a2_fit = fitness(a2);
-					
-					int fC = Math.min(c1_fit, c2_fit);
-					int fA = Math.min(a1_fit, a2_fit);
-					
-					//System.out.println(fC + " " + fA);
-					
-					/*System.out.println("\nBefore coverage");
-					System.out.println("a1 " + Arrays.toString(a1) + " = " + coverage(a1.clone(), devices, E, P));
-					System.out.println("a2 " + Arrays.toString(a2) + " = " + coverage(a2.clone(), devices, E, P));
-					System.out.println("c1 " + Arrays.toString(c1) + " = " + coverage(c1.clone(), devices, E, P));
-					System.out.println("c2 " + Arrays.toString(c2) + " = " + coverage(c2.clone(), devices, E, P));*/
-					
-					double c1_cover = coverage(c1.clone(), devices);
-					double c2_cover = coverage(c2.clone(), devices);
-					double a1_cover = coverage(a1.clone(), devices);
-					double a2_cover = coverage(a2.clone(), devices);
-					cover_map.put(c1, c1_cover);
-					cover_map.put(c2, c2_cover);
-					cover_map.put(a1, a1_cover);
-					cover_map.put(a2, a2_cover);
-					//System.out.println("Here==" + cover_map.get(a1));
-					
-					double Vc = Math.min(c1_cover, c2_cover);
-					double Va = Math.min(a1_cover, a2_cover);
-					
-					/*
-					System.out.println("\nAfter coverage");
-					System.out.println("a1 " + Arrays.toString(a1) + " = " + coverage(a1.clone(), devices, E, P));
-					System.out.println("a2 " + Arrays.toString(a2) + " = " + coverage(a2.clone(), devices, E, P));
-					System.out.println("c1 " + Arrays.toString(c1) + " = " + coverage(c1.clone(), devices, E, P));
-					System.out.println("c2 " + Arrays.toString(c2) + " = " + coverage(c2.clone(), devices, E, P));
-					System.out.println(Vc + " " + Va);
-					*/
-					
-					/*ArrayList<Cloudlet[]> population = 	new ArrayList<Cloudlet[]>();
-					population.add(c1);
-					population.add(c2);
-					population.add(a1);
-					population.add(a2);*/
-					
-					//Cloudlet[] IF = fittest(population, cover_map, cost);
-					//cover_map.put(IF, coverage(IF.clone(), devices, E, P));
-					//System.out.println(Arrays.toString(IF));
-					if((fA < fC) || ((fA == fC) && (Va >= Vc))) {
-							//System.out.println(cover_map.get(a1a2[i]));
-							if(cover_map.get(a1) >= threshold) {
-								B.add(a1);
-								cover_map.remove(c1);
-							}
-							else {
-								cover_map.remove(c1);
-								cover_map.remove(a1);
-							}
-							if(cover_map.get(a2) >= threshold) {
-								B.add(a2);
-								cover_map.remove(c2);
-							}
-							else {
-								cover_map.remove(c2);
-								cover_map.remove(a2);
-							}
-					}
-					else {
-						B.add(c1);
-						B.add(c2);
-						cover_map.remove(a1);
-						cover_map.remove(a2);
-					}
+				if(!pq.isEmpty()) {
+					c1 = pq.remove();
 				}
-				//System.out.println(B.toString());
-				Cloudlet[][] temp = new Cloudlet[B.size()][n];
-				for(int i = 0; i<B.size(); i++) {
-					temp[i] = B.get(i);
+				else {
+					c1 = oneRandomCloudlet();
 				}
-				cloudlets = temp;
-				/*System.out.println("\nBest so far");
-				for(int i = 0; i<B.size(); i++) {
-					System.out.println(Arrays.toString(B.get(i)) + " " + fitness(B.get(i), cost) + " " + cover_map.get(B.get(i)));
+				if(!pq.isEmpty()) {
+					c2 = pq.remove();
+				}
+				else {
+					c2 = oneRandomCloudlet();
+				}
+				//System.out.println(Arrays.toString(pq.remove()));
+				
+				
+				//for crossover probability
+				Random rand = new Random();
+				int x = rand.nextInt(10);
+				//System.out.println(x);
+				
+				/*System.out.println("Before Crossover");
+				System.out.println("c1 " + Arrays.toString(c1) + "= " + fitness(c1, cost));
+				System.out.println("c2 " + Arrays.toString(c2) + "= " + fitness(c2, cost));*/
+				
+				//crossover probability is 0.5 for now
+				if(x >= 5) {
+					//System.out.println("Crossover happend!");
+					a1 = crossOver(c1.clone(),c2.clone())[0];
+					a2 = crossOver(c1.clone(),c2.clone())[1];
+				}
+				else {
+					a1 = c1.clone();
+					a2 = c2.clone();
+				}
+	
+				/*System.out.println("\nAfter Crossover, before mutation");
+				System.out.println("a1 " + Arrays.toString(a1)+ "= " + fitness(a1, cost));
+				System.out.println("a2 " + Arrays.toString(a2)+ "= " + fitness(a2, cost));*/
+				
+				a1 = mutate(a1);
+				a2 = mutate(a2);
+				
+				/*System.out.println("\nAfter mutation");
+				System.out.println("a1 " + Arrays.toString(a1)+ "= " + fitness(a1, cost));
+				System.out.println("a2 " + Arrays.toString(a2)+ "= " + fitness(a2, cost));
+				System.out.println("c1 " + Arrays.toString(c1) + "= " + fitness(c1, cost));
+				System.out.println("c2 " + Arrays.toString(c2) + "= " + fitness(c2, cost));*/
+				
+				int c1_fit = fitness(c1);
+				int c2_fit = fitness(c2);
+				int a1_fit = fitness(a1);
+				int a2_fit = fitness(a2);
+				
+				int fC = Math.min(c1_fit, c2_fit);
+				int fA = Math.min(a1_fit, a2_fit);
+				
+				//System.out.println(fC + " " + fA);
+				
+				/*System.out.println("\nBefore coverage");
+				System.out.println("a1 " + Arrays.toString(a1) + " = " + coverage(a1.clone(), devices, E, P));
+				System.out.println("a2 " + Arrays.toString(a2) + " = " + coverage(a2.clone(), devices, E, P));
+				System.out.println("c1 " + Arrays.toString(c1) + " = " + coverage(c1.clone(), devices, E, P));
+				System.out.println("c2 " + Arrays.toString(c2) + " = " + coverage(c2.clone(), devices, E, P));*/
+				
+				//System.out.println("1" + Arrays.toString(devices));
+				double c1_cover = maxCover(devices, c1.clone());
+				//System.out.println("2" + Arrays.toString(devices));
+				double c2_cover = maxCover(devices, c2.clone());
+				//System.out.println("3" + Arrays.toString(devices));
+				double a1_cover = maxCover(devices, a1.clone());
+				double a2_cover = maxCover(devices, a2.clone());
+				cover_map.put(c1, c1_cover);
+				cover_map.put(c2, c2_cover);
+				cover_map.put(a1, a1_cover);
+				cover_map.put(a2, a2_cover);
+				//System.out.println("Here==" + cover_map.get(a1));
+				/*if(fitness(c1) == 38) {
+					null_counter++;
+					if(null_counter > 3)
+						System.exit(0);
 				}*/
 				
-			} while(!underThreshold(cloudlets, cover_map, threshold));
+				double Vc = Math.min(c1_cover, c2_cover);
+				double Va = Math.min(a1_cover, a2_cover);
+				
+				
+				/*System.out.println("\nAfter coverage");
+				System.out.println("a1 " + Arrays.toString(a1) + " = " + (fitness(a1) + this.estimate_optimal_cost) + " " + maxCover(devices, a1.clone()));
+				System.out.println("a2 " + Arrays.toString(a2) + " = " + (fitness(a2) + this.estimate_optimal_cost) + " " + maxCover(devices, a2.clone()));
+				System.out.println("c1 " + Arrays.toString(c1) + " = " + (fitness(c1) + this.estimate_optimal_cost) + " " + maxCover(devices, c1.clone()));
+				System.out.println("c2 " + Arrays.toString(c2) + " = " + (fitness(c2) + this.estimate_optimal_cost) + " " + maxCover(devices, c2.clone()));
+				System.out.println(Vc + " " + Va);*/
+				
+				
+				/*ArrayList<Cloudlet[]> population = 	new ArrayList<Cloudlet[]>();
+				population.add(c1);
+				population.add(c2);
+				population.add(a1);
+				population.add(a2);*/
+				
+				//Cloudlet[] IF = fittest(population, cover_map, cost);
+				//cover_map.put(IF, coverage(IF.clone(), devices, E, P));
+				//System.out.println(Arrays.toString(IF));
+				if((fA < fC) || ((fA == fC) && (Va >= Vc))) {
+						//System.out.println(cover_map.get(a1a2[i]));
+						if(cover_map.get(a1) >= threshold) {
+							B.add(a1);
+							cover_map.remove(c1);
+						}
+						else {
+							cover_map.remove(c1);
+							cover_map.remove(a1);
+						}
+						if(cover_map.get(a2) >= threshold) {
+							B.add(a2);
+							cover_map.remove(c2);
+						}
+						else {
+							cover_map.remove(c2);
+							cover_map.remove(a2);
+						}
+				}
+				else {
+					if(cover_map.get(c1) >= threshold) {
+						B.add(c1);
+					}
+					else {
+						cover_map.remove(c1);
+					}
+					if(cover_map.get(c2) >= threshold) {
+						B.add(c2);
+					}
+					else {
+						cover_map.remove(c2);
+					}
+					cover_map.remove(a1);
+					cover_map.remove(a2);
+				}
+			}
+			//System.out.println(B.toString());
+			Cloudlet[][] temp = new Cloudlet[B.size()][n];
+			for(int i = 0; i<B.size(); i++) {
+				temp[i] = B.get(i);
+			}
+			cloudlets = temp;
+			/*System.out.println("\nBest so far");
+			for(int i = 0; i<B.size(); i++) {
+				System.out.println(Arrays.toString(B.get(i)) + " " + fitness(B.get(i), cost) + " " + cover_map.get(B.get(i)));
+			}*/
 			
-			//System.out.println(Arrays.toString(devices));
-			
-			int[][] devices_new = new int[cloudlets.length][v];
-			devices_new = maximizeCover(devices, cloudlets);
-			//System.out.println(Arrays.toString(devices));
-			
-			int index = selectLeastLatency(devices_new, cloudlets);
-			//int index = selectLeastCost(cloudlets);
-			this.final_cost = totalCost(cloudlets[index]);
-			//this.final_latency = totalLatency(devices_new[index], cloudlets[index]);
-			this.final_coverage = coverage(cloudlets[index].clone(), devices_new[index]);
-			System.out.println(index + ">" + Arrays.toString(cloudlets[index]) + " " + 
-			this.final_cost + " " + this.final_coverage + "\n"
-			+ index + ">" + Arrays.toString(devices_new[index]) + " " + this.final_latency);
+		} while(!underThreshold(cloudlets, cover_map, threshold));
+		
+		//System.out.println(Arrays.toString(devices));
+		
+		int[][] devices_new = new int[cloudlets.length][v];
+		devices_new = maximizeCover(devices, cloudlets);
+		//System.out.println(Arrays.toString(devices));
+		
+		//int index = selectLeastLatency(devices_new, cloudlets);
+		int index = selectLeastCost(cloudlets);
+		//this.final_cost = totalCost(cloudlets[index]);
+		this.final_latency = totalLatency(devices_new[index], cloudlets[index]);
+		this.final_coverage = coverage(cloudlets[index].clone(), devices_new[index]);
+		System.out.println(index + ">" + Arrays.toString(cloudlets[index]) + " " + 
+		this.final_cost + " " + this.final_coverage + " " + maxCover(devices_new[index], cloudlets[index].clone()) 
+		+ " " + coverage(cloudlets[index].clone(), devices)+ " " + cover_map.get(cloudlets[index]) + "\n"
+		+ index + ">" + Arrays.toString(devices_new[index]) + " " + this.final_latency);
+	}
+
+	private Cloudlet[] oneRandomCloudlet() {
+		// TODO Auto-generated method stub
+		Cloudlet[] cloudlets = new Cloudlet[P.size()];
+		
+		ArrayList<Integer> indexes = new ArrayList<Integer>();
+		for(int i = 0; i < P.size(); i++) {
+			indexes.add(i);
 		}
+		for(Cloudlet c: C) {
+			Random rand = new Random();
+			int x = rand.nextInt(indexes.size());
+			//System.out.println(indexes.size() + " " + c.id);
+			cloudlets[indexes.get(x)] = c;
+			indexes.remove(x);
+		}
+		return cloudlets;
 	}
 
 	private int selectLeastLatency(int[][] devices_new, Cloudlet[][] cloudlets) {
@@ -292,12 +333,14 @@ public class GeneticCloudletPlacement {
 								min_dist = d;
 								min_dist_index = k;
 							}
-							processor[k] -= E.get(j).processor;
-							memory[k] -= E.get(j).memory;
-							storage[k] -= E.get(j).storage;
 						}
 					}
 					devices_new[i][j] = min_dist_index;
+					if(cloudlets[i][min_dist_index] != null) {
+						processor[min_dist_index] -= E.get(j).processor;
+						memory[min_dist_index] -= E.get(j).memory;
+						storage[min_dist_index] -= E.get(j).storage;
+					}
 				}
 			}
 			//System.out.println(">-" + Arrays.toString(devices_new[i]));
@@ -415,6 +458,68 @@ public class GeneticCloudletPlacement {
 		}
 		
 		return coverage/E.size();
+	}
+	
+	private double maxCover(int[] devices, Cloudlet[] cloudlets) {
+		// TODO Auto-generated method stub
+		int[] devices_new = devices.clone();
+		double covered = 0;
+		
+		//System.out.println("->" + Arrays.toString(devices_new[i]));
+		int[] processor = new int[cloudlets.length];
+		int[] memory = new int[cloudlets.length];
+		int[] storage = new int[cloudlets.length];
+		
+		//copy of the cloudlet specifications so that
+		//they do get reset for next coverage maximization
+		for(int j = 0; j < cloudlets.length; j++) {
+			if(cloudlets[j] != null) {
+				processor[j] = cloudlets[j].processor;
+				memory[j] = cloudlets[j].memory;
+				storage[j] = cloudlets[j].storage;
+			}
+		}
+		
+		for(int j = 0; j < E.size(); j++) {
+			int index = devices_new[j];
+			//System.out.println(index + " " +cloudlets[index]);
+			if(cloudlets[index] == null) {
+				double min_dist = Double.MAX_VALUE;
+				int min_dist_index = index;
+				for(int k = 0; k < cloudlets.length; k++) {
+					if(cloudlets[k] != null && inRangeAndCapacity(k, processor, memory, storage, cloudlets[k], E.get(j))) {
+						double d = distance(P.get(k).xlocation, P.get(k).ylocation,
+								E.get(j).xlocation, E.get(j).ylocation);
+						if(d < min_dist) {
+							min_dist = d;
+							min_dist_index = k;
+						}
+					}
+				}
+				//System.out.println(devices_new[j] + " " + min_dist_index);
+				devices_new[j] = min_dist_index;
+				if(cloudlets[min_dist_index] != null) {
+					//System.out.println("There");
+					covered++;
+					processor[min_dist_index] -= E.get(j).processor;
+					memory[min_dist_index] -= E.get(j).memory;
+					storage[min_dist_index] -= E.get(j).storage;
+				}
+			}
+			else {
+				//System.out.println("Here");
+				if(inRangeAndCapacity(index, processor, storage, memory, cloudlets[index], E.get(j))) {
+					covered++;
+					//System.out.println(processor[point] + " - " + cloudlets[index].processor);
+					processor[index] -= E.get(j).processor;
+					memory[index] -= E.get(j).memory;
+					storage[index] -= E.get(j).storage;
+				}
+			}
+			//System.out.println("Covered: " + covered/E.size());
+			//System.out.println(">-" + Arrays.toString(devices_new[i]));
+		}
+		return covered/E.size();
 	}
 	
 	private boolean inRangeAndCapacity(int point, int[] processor, int[] storage, int[] memory, Cloudlet c1, EndDevice endDevice) {
