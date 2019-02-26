@@ -53,7 +53,7 @@ public class GeneticCloudletPlacement {
 		HashMap<Cloudlet[], Double> cover_map = new HashMap<Cloudlet[], Double>();
 		
 		this.estimate_optimal_cost = estimateOptimal();
-		System.out.println(estimate_optimal_cost);
+		System.out.println("Estimated optimal cost: " + estimate_optimal_cost);
 		
 		//variable holding assignments for the cloudlets
 		Cloudlet[][] cloudlets = new Cloudlet[m][n];
