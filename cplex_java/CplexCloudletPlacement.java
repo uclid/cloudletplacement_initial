@@ -198,13 +198,13 @@ public class CplexCloudletPlacement {
 		    
 		    //threshold value for latency, used when minimizing cost
 		    //sum(e in E) (sum (p in CandidatePoints) Latency[e][p] * select_end[e][p]) <= 190;
-			IloLinearNumExpr sum_latency = model.linearNumExpr();
+			/*IloLinearNumExpr sum_latency = model.linearNumExpr();
 			for(int i = 0; i < v; i++) {
 				for(int k=0; k < n; k++) {
 					sum_latency.addTerm(a[i][k], latency[i][k]);
 				}
 				model.addLe(sum_latency, 855);
-			}
+			}*/
 			
 			/*
 			 * Now towards solving the model
