@@ -638,14 +638,14 @@ public class GeneticCloudletPlacement {
 
 				}
 				else if(y == 1) {
-					mutated[i] = new Cloudlet((this.num_large+this.num_medium+this.num_small), 200,200,200,3);
+					mutated[i] = new Cloudlet((this.num_large+this.num_medium+this.num_small), 650,650,650,9);
 				}
 				else if(y == 2) {
-					mutated[i] = new Cloudlet((this.num_medium+this.num_small), 100,100,100,2);
+					mutated[i] = new Cloudlet((this.num_medium+this.num_small), 450,450,450,6);
 				}
 				else{
 					//small cloudlet has id 1
-					mutated[i] = new Cloudlet(this.num_small, 50,50,50,1);
+					mutated[i] = new Cloudlet(this.num_small, 250,250,250,3);
 				}
 			}
 			
