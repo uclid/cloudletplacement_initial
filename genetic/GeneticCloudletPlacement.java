@@ -45,19 +45,21 @@ public class GeneticCloudletPlacement {
 	 * @param latency latency matrix
 	 * @param threshold 
 	 */
-	public void geneticAlgorithm(int assignment_size, double threshold) {
+	public void geneticAlgorithm(int assignment_size, int threshold) {
 		
 		int n = P.size();
 		int v = E.size();
 		int m = assignment_size;
-		HashMap<Cloudlet[], Double> cover_map = new HashMap<Cloudlet[], Double>();
-		HashMap<Cloudlet[], Integer> fitness_map = new HashMap<Cloudlet[], Integer>();
+		HashMap<Cloudlet[], Double> fitness_map = new HashMap<Cloudlet[], Double>();
+		HashMap<Cloudlet[], Integer> cost_map = new HashMap<Cloudlet[], Integer>();
 		
 		CplexLPCloudletPlacement place = new CplexLPCloudletPlacement();
 		int[] results = place.cplexModel(C, P, E, cost, latency);
 		estimate_optimal_cost = results[0];
 		min_needed_cloudlets = results[1];
-		System.out.println("LP Optimal cost: " + estimate_optimal_cost + " Placed Cloudlets: " + min_needed_cloudlets);
+		System.out.println("LP Optimal cost: " + estimate_optimal_cost + " LP Optimal Cloudlets: " + min_needed_cloudlets);
+		min_needed_cloudlets = (int)Math.ceil((min_needed_cloudlets + C.size())/2.0);
+		System.out.println("Placed Cloudlets: " + min_needed_cloudlets);
 		
 		//variable holding assignments for the cloudlets
 		Cloudlet[][] cloudlets = new Cloudlet[m][n];
@@ -110,7 +112,7 @@ public class GeneticCloudletPlacement {
 				System.out.println("c2 " + Arrays.toString(c2) + "= " + fitness(c2, cost));*/
 				
 				//crossover probability is 0.5 for now
-				if(x >= 5) {
+				if(x >= 8) {
 					//System.out.println("Crossover happend!");
 					a1 = crossOver(c1.clone(),c2.clone())[0];
 					a2 = crossOver(c1.clone(),c2.clone())[1];
@@ -133,13 +135,13 @@ public class GeneticCloudletPlacement {
 				System.out.println("c1 " + Arrays.toString(c1) + "= " + fitness(c1, cost));
 				System.out.println("c2 " + Arrays.toString(c2) + "= " + fitness(c2, cost));*/
 				
-				int c1_fit = fitness(c1);
-				int c2_fit = fitness(c2);
-				int a1_fit = fitness(a1);
-				int a2_fit = fitness(a2);
+				double c1_fit = fitness(c1, devices);
+				double c2_fit = fitness(c2, devices);
+				double a1_fit = fitness(a1, devices);
+				double a2_fit = fitness(a2, devices);
 				
-				int fC = Math.min(c1_fit, c2_fit);
-				int fA = Math.min(a1_fit, a2_fit);
+				double fC = Math.min(c1_fit, c2_fit);
+				double fA = Math.min(a1_fit, a2_fit);
 				
 				//System.out.println(fC + " " + fA);
 				
@@ -150,12 +152,12 @@ public class GeneticCloudletPlacement {
 				System.out.println("c2 " + Arrays.toString(c2) + " = " + coverage(c2.clone(), devices, E, P));*/
 				
 				//System.out.println("1" + Arrays.toString(devices));
-				double c1_cover = maxCoverage(devices, c1.clone());
+				int c1_cost = totalCost(c1.clone());
 				//System.out.println("2" + Arrays.toString(devices));
-				double c2_cover = maxCoverage(devices, c2.clone());
+				int c2_cost = totalCost(c2.clone());
 				//System.out.println("3" + Arrays.toString(devices));
-				double a1_cover = maxCoverage(devices, a1.clone());
-				double a2_cover = maxCoverage(devices, a2.clone());
+				int a1_cost = totalCost(a1.clone());
+				int a2_cost = totalCost(a2.clone());
 				//cover_map.put(c1, c1_cover);
 				//cover_map.put(c2, c2_cover);
 				//cover_map.put(a1, a1_cover);
@@ -167,8 +169,8 @@ public class GeneticCloudletPlacement {
 						System.exit(0);
 				}*/
 				
-				double Vc = Math.min(c1_cover, c2_cover);
-				double Va = Math.min(a1_cover, a2_cover);
+				int Vc = Math.min(c1_cost, c2_cost);
+				int Va = Math.min(a1_cost, a2_cost);
 				
 				
 				/*System.out.println("\nAfter coverage");
@@ -178,29 +180,33 @@ public class GeneticCloudletPlacement {
 				System.out.println("c2 " + Arrays.toString(c2) + " = " + (fitness(c2) + this.estimate_optimal_cost) + " " + maxCover(devices, c2.clone()));
 				System.out.println(Vc + " " + Va);*/
 				
-				if((fA < fC) || ((fA == fC) && (Va >= Vc))) {
+				if((fA < fC) || ((fA == fC) && (Va <= Vc))) {
 						//System.out.println(cover_map.get(a1a2[i]));
-						if(a1_cover >= threshold) {
+						if(a1_cost >= estimate_optimal_cost && a1_cost <= threshold) {
 							B.add(a1);
-							cover_map.put(a1, a1_cover);
+							cost_map.put(a1, a1_cost);
 							fitness_map.put(a1, a1_fit);
+							//System.out.println(Arrays.toString(a1) + " " + fitness_map.get(a1));
 						}
-						if(a2_cover >= threshold) {
+						if(a2_cost >= estimate_optimal_cost && a2_cost <= threshold) {
 							B.add(a2);
-							cover_map.put(a2, a2_cover);
+							cost_map.put(a2, a2_cost);
 							fitness_map.put(a2, a2_fit);
+							//System.out.println(Arrays.toString(a2) + " " + fitness_map.get(a2));
 						}
 				}
 				else {
-					if(c1_cover >= threshold) {
+					if(c1_cost >= estimate_optimal_cost && c1_cost <= threshold) {
 						B.add(c1);
-						cover_map.put(c1, c1_cover);
+						cost_map.put(c1, c1_cost);
 						fitness_map.put(c1, c1_fit);
+						//System.out.println(Arrays.toString(c1) + " " + fitness_map.get(c1));
 					}
-					if(c2_cover >= threshold) {
+					if(c2_cost >= estimate_optimal_cost && c2_cost <= threshold) {
 						B.add(c2);
-						cover_map.put(c2, c2_cover);
+						cost_map.put(c2, c2_cost);
 						fitness_map.put(c2, c2_fit);
+						//System.out.println(Arrays.toString(c2) + " " + fitness_map.get(c2));
 					}
 				}
 			}
@@ -215,7 +221,7 @@ public class GeneticCloudletPlacement {
 				System.out.println(Arrays.toString(B.get(i)) + " " + fitness(B.get(i), cost) + " " + cover_map.get(B.get(i)));
 			}*/
 			
-		} while(!underThreshold(cloudlets, cover_map, threshold));
+		} while(!underThreshold(cloudlets, fitness_map));
 		
 		//System.out.println(Arrays.toString(devices));
 		
@@ -224,15 +230,26 @@ public class GeneticCloudletPlacement {
 		//System.out.println(Arrays.toString(devices));
 		
 		//int index = selectLeastLatency(devices_new, cloudlets);
-		int index = selectLeastCost(cloudlets);
+		//int index = selectLeastCost(cloudlets);
+		int index = selectFittest(cloudlets, fitness_map);
 		int[] devices_max = new int[v];
 		devices_max = maxCoverageIndexes(devices, cloudlets[index]);
-		//this.final_cost = totalCost(cloudlets[index]);
+		this.final_cost = totalCost(cloudlets[index]);
 		final_latency = totalLatency(devices_max, cloudlets[index]);
 		final_coverage = maxCoverage(devices, cloudlets[index].clone());
 		System.out.println(index + ">" + Arrays.toString(cloudlets[index]) + " " + 
 		final_cost + " " + final_coverage + " " + final_latency + "\n"
 		+ index + ">" + Arrays.toString(devices_max));
+	}
+
+	private int selectFittest(Cloudlet[][] cloudlets, HashMap<Cloudlet[], Double> fitness_map) {
+		// TODO Auto-generated method stub
+		for(int i  = 0; i < cloudlets.length; i++) {
+			if(fitness_map.get(cloudlets[i]) == 0) {
+				return i;
+			}
+		}
+		return 0;
 	}
 
 	/*private boolean underFitnessThreshold(Cloudlet[][] cloudlets, HashMap<Cloudlet[], Integer> fitness_map) {
@@ -401,14 +418,14 @@ public class GeneticCloudletPlacement {
 		return devices_new;
 	}*/
 
-	private boolean underThreshold(Cloudlet[][] cloudlets, HashMap<Cloudlet[], Double> cover_map, double threshold) {
+	private boolean underThreshold(Cloudlet[][] cloudlets, HashMap<Cloudlet[], Double> fitness_map) {
 		// TODO Auto-generated method stub
 		for(Cloudlet[] c: cloudlets) {
-			if(cover_map.get(c) < threshold) {
-				return false;
+			if(fitness_map.get(c) == 0.0) {
+				return true;
 			}
 		}
-		return true;
+		return false;
 	}
 
 	/*private int estimateOptimal() {
@@ -591,19 +608,10 @@ public class GeneticCloudletPlacement {
 		return false;
 	}
 
-	private int fitness(Cloudlet[] b) {
+	private double fitness(Cloudlet[] b, int[] devices) {
 		// TODO Auto-generated method stub
-		int total_cost = 0;
-		
-		for(int i = 0; i < b.length; i++) {
-			if(b[i] != null) {
-				total_cost += cost[b[i].id - 1][i];
-			}
-		}
-		
-		int dist_from_total = Math.abs(total_cost - this.estimate_optimal_cost);
-		
-		return dist_from_total;
+		double fitness = (1.0 - maxCoverage(devices, b));
+		return fitness;
 	}
 	
 	private int selectLeastCost(Cloudlet[][] cloudlets) {
