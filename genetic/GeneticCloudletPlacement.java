@@ -226,8 +226,8 @@ public class GeneticCloudletPlacement {
 		final_latency = totalLatency(devices_max, cloudlets[index]);
 		final_coverage = maxCoverage(devices, cloudlets[index].clone());
 		System.out.println(index + ">" + Arrays.toString(cloudlets[index]) + " " + 
-		final_cost + " " + final_coverage + "\n"
-		+ index + ">" + Arrays.toString(devices_max) + " " + final_latency);
+		final_cost + " " + final_coverage + " " + final_latency + "\n"
+		+ index + ">" + Arrays.toString(devices_max));
 	}
 
 	private int[] maxCoverageIndexes(int[] devices, Cloudlet[] cloudlets) {
@@ -298,11 +298,11 @@ public class GeneticCloudletPlacement {
 		for(int i = 0; i < P.size(); i++) {
 			indexes.add(i);
 		}
-		for(Cloudlet c: C) {
+		for(int j = C.size()-1; j >= (C.size() - min_needed_cloudlets); j--) {
 			Random rand = new Random();
 			int x = rand.nextInt(indexes.size());
 			//System.out.println(indexes.size() + " " + c.id);
-			cloudlets[indexes.get(x)] = c;
+			cloudlets[indexes.get(x)] = C.get(j);
 			indexes.remove(x);
 		}
 		return cloudlets;
@@ -769,7 +769,7 @@ public class GeneticCloudletPlacement {
 		return devices;
 	}
 
-	private Cloudlet[][] randomAssignments(int n, int m) {
+	/*private Cloudlet[][] randomAssignments(int n, int m) {
 		// TODO Auto-generated method stub
 		Cloudlet[][] cloudlets = new Cloudlet[m][n];
 		
@@ -790,9 +790,9 @@ public class GeneticCloudletPlacement {
 		}
 		
 		return cloudlets;
-	}
+	}*/
 	
-	/*private Cloudlet[][] randomAssignments(int n, int m) {
+	private Cloudlet[][] randomAssignments(int n, int m) {
 		// TODO Auto-generated method stub
 		Cloudlet[][] cloudlets = new Cloudlet[m][n];
 		
@@ -801,7 +801,7 @@ public class GeneticCloudletPlacement {
 			for(int i = 0; i < n; i++) {
 				indexes.add(i);
 			}
-			for(int j = C.size()-1; j >= (this.min_needed_cloudets - 1); j--) {
+			for(int j = C.size()-1; j >= (C.size() - min_needed_cloudlets); j--) {
 				Random rand = new Random();
 				int x = rand.nextInt(indexes.size());
 				//System.out.println(indexes.size() + " " + c.id);
@@ -813,7 +813,7 @@ public class GeneticCloudletPlacement {
 		}
 		
 		return cloudlets;
-	}*/
+	}
 	
 	public double distance(int x1, int y1, int x2, int y2) {
 		int y_diff = y2-y1;
