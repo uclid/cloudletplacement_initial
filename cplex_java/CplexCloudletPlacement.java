@@ -55,8 +55,8 @@ public class CplexCloudletPlacement {
 			}
 			
 			//latency minimization
-			/*
-			IloLinearNumExpr latency_obj = model.linearNumExpr();
+			
+			/*IloLinearNumExpr latency_obj = model.linearNumExpr();
 			for(int i = 0; i < v; i++) {
 				for(int k = 0; k < n; k++) {
 					latency_obj.addTerm(a[i][k], latency[i][k]);
@@ -184,26 +184,51 @@ public class CplexCloudletPlacement {
 			}
 			
 			/*
+			 * Optional constraints for sensitivity analysis
+			 * */
+			//threshold value for cost, used when minimizing latency.
+			//sum(c in C) (sum (p in CandidatePoints) Cost[c][p] * select[c][p]) <= 14;
+			/*IloLinearNumExpr sum_cost = model.linearNumExpr();
+			for(int j = 0; j < w; j++) {
+				for(int k=0; k < n; k++) {
+					sum_cost.addTerm(y[j][k], cost[j][k]);
+				}
+				model.addLe(sum_cost, 34);
+			}*/
+		    
+		    //threshold value for latency, used when minimizing cost
+		    //sum(e in E) (sum (p in CandidatePoints) Latency[e][p] * select_end[e][p]) <= 190;
+			IloLinearNumExpr sum_latency = model.linearNumExpr();
+			for(int i = 0; i < v; i++) {
+				for(int k=0; k < n; k++) {
+					sum_latency.addTerm(a[i][k], latency[i][k]);
+				}
+				model.addLe(sum_latency, 855);
+			}
+			
+			/*
 			 * Now towards solving the model
 			 * */
 			boolean isSolved = model.solve();
 			if(isSolved) {
 				double objValue = model.getObjValue();
 				System.out.println("\nObjective value is: " + objValue);
-				/*System.out.print("\nCloudlet Assignments\n");
+				System.out.print("\nCloudlet Assignments\n");
 				for(int j = 0; j < w; j++) {
 					for(int k=0; k < n; k++) {
-						System.out.print(" y[" + j + "][" + k + "] = " + model.getValue(y[j][k]));
+						if(model.getValue(y[j][k]) == 1)
+							System.out.print(" y[" + j + "][" + k + "] = " + model.getValue(y[j][k]));
 					}
-					System.out.println("\n");
+					//System.out.println("\n");
 				}
 				System.out.print("\nDevice Assignments\n");
 				for(int i = 0; i < v; i++) {
 					for(int k=0; k < n; k++) {
-						System.out.print(" a[" + i + "][" + k + "] = " + model.getValue(a[i][k]));
+						if(model.getValue(a[i][k]) == 1)
+							System.out.print(" a[" + i + "][" + k + "] = " + model.getValue(a[i][k]));
 					}
-					System.out.println("\n");
-				}*/
+					//System.out.println("\n");
+				}
 				
 			}
 			else {
