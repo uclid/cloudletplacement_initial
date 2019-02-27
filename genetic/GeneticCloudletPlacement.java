@@ -12,7 +12,7 @@ public class GeneticCloudletPlacement {
 	private int[][] cost = {{}};
 	private int[][] latency = {{}};
 	private int estimate_optimal_cost = 0;
-	//private int min_needed_cloudets = 0;
+	private int min_needed_cloudlets = 0;
 	private int final_cost = 0;
 	private double final_latency = 0;
 	private double final_coverage = 0;
@@ -52,8 +52,11 @@ public class GeneticCloudletPlacement {
 		int m = assignment_size;
 		HashMap<Cloudlet[], Double> cover_map = new HashMap<Cloudlet[], Double>();
 		
-		this.estimate_optimal_cost = estimateOptimal();
-		System.out.println("Estimated optimal cost: " + estimate_optimal_cost);
+		CplexLPCloudletPlacement place = new CplexLPCloudletPlacement();
+		int[] results = place.cplexModel(C, P, E, cost, latency);
+		estimate_optimal_cost = results[0];
+		min_needed_cloudlets = results[1];
+		System.out.println("LP Optimal cost: " + estimate_optimal_cost + " Placed Cloudlets: " + min_needed_cloudlets);
 		
 		//variable holding assignments for the cloudlets
 		Cloudlet[][] cloudlets = new Cloudlet[m][n];
@@ -220,11 +223,11 @@ public class GeneticCloudletPlacement {
 		int[] devices_max = new int[v];
 		devices_max = maxCoverageIndexes(devices, cloudlets[index]);
 		//this.final_cost = totalCost(cloudlets[index]);
-		this.final_latency = totalLatency(devices_max, cloudlets[index]);
-		this.final_coverage = maxCoverage(devices, cloudlets[index].clone());
+		final_latency = totalLatency(devices_max, cloudlets[index]);
+		final_coverage = maxCoverage(devices, cloudlets[index].clone());
 		System.out.println(index + ">" + Arrays.toString(cloudlets[index]) + " " + 
-		this.final_cost + " " + this.final_coverage + "\n"
-		+ index + ">" + Arrays.toString(devices_max) + " " + this.final_latency);
+		final_cost + " " + final_coverage + "\n"
+		+ index + ">" + Arrays.toString(devices_max) + " " + final_latency);
 	}
 
 	private int[] maxCoverageIndexes(int[] devices, Cloudlet[] cloudlets) {
@@ -394,7 +397,7 @@ public class GeneticCloudletPlacement {
 		return true;
 	}
 
-	private int estimateOptimal() {
+	/*private int estimateOptimal() {
 		// TODO Auto-generated method stub
 		int total_proc_demand = 0;
 		int total_mem_demand = 0;
@@ -460,7 +463,7 @@ public class GeneticCloudletPlacement {
 		}
 		
 		return optimal_for_type;
-	}
+	}*/
 
 	/*private double coverage(Cloudlet[] c1, int[] devices) {
 		// TODO Auto-generated method stub
