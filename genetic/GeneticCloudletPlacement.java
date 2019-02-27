@@ -59,7 +59,7 @@ public class GeneticCloudletPlacement {
 		min_needed_cloudlets = results[1];
 		System.out.println("LP Optimal cost: " + estimate_optimal_cost + " LP Optimal Cloudlets: " + min_needed_cloudlets);
 		min_needed_cloudlets = (int)Math.ceil((min_needed_cloudlets + C.size())/2.0);
-		System.out.println("Placed Cloudlets: " + min_needed_cloudlets);
+		//System.out.println("Placed Cloudlets: " + min_needed_cloudlets);
 		
 		//variable holding assignments for the cloudlets
 		Cloudlet[][] cloudlets = new Cloudlet[m][n];
@@ -76,7 +76,7 @@ public class GeneticCloudletPlacement {
 		//System.out.println(Arrays.toString(devices));
 		do {
 			ArrayList<Cloudlet[]> B = new ArrayList<Cloudlet[]>();
-			PriorityQueue<Cloudlet[]> pq = new PriorityQueue<Cloudlet[]>(m, new AssignmentsComparator(cost));
+			PriorityQueue<Cloudlet[]> pq = new PriorityQueue<Cloudlet[]>(m, new AssignmentsComparator(devices, C, P, E));
 			for(int i = 0; i < m; i++) {
 				pq.add(cloudlets[i]);
 			}
