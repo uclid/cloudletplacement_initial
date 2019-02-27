@@ -17,9 +17,9 @@ public class RunGenetic {
 		//7 candidate points as per our optimization example
 		int num_candidates = 18;
 		//number of assignments in the algorithm seed set
-		int assignment_size = 10;
+		int assignment_size = 100;
 		//threshold value for coverage, 95% for now
-		double threshold = 0.95;
+		double threshold = 1.0;
 		
 		ReadCSV reader = new ReadCSV();
 		int[][] cloudlet_specs = reader.getCloudlets(num_cloudlets);
@@ -31,10 +31,10 @@ public class RunGenetic {
 		for(int i = 0; i < cloudlet_specs.length; i++) {
 			cloudlets.add(new Cloudlet(cloudlet_specs[i][0], cloudlet_specs[i][1], 
 					cloudlet_specs[i][2], cloudlet_specs[i][3], cloudlet_specs[i][4]));
-			if(cloudlet_specs[i][1] == 600) {
+			if(cloudlet_specs[i][1] == 750) {
 				num_large++;
 			}
-			else if(cloudlet_specs[i][1] == 400) {
+			else if(cloudlet_specs[i][1] == 550) {
 				num_medium++;
 			}
 			else {

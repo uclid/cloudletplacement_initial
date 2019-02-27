@@ -24,10 +24,10 @@ public class Cloudlet {
 	public String toString() {
 		String type = "";
 		
-		if(this.processor == 600) {
+		if(this.processor == 750) {
 			type = "c1";
 		}
-		else if(this.processor == 400) {
+		else if(this.processor == 550) {
 			type = "c2";
 		}
 		else {
