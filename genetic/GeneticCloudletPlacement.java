@@ -51,6 +51,7 @@ public class GeneticCloudletPlacement {
 		int v = E.size();
 		int m = assignment_size;
 		HashMap<Cloudlet[], Double> cover_map = new HashMap<Cloudlet[], Double>();
+		HashMap<Cloudlet[], Integer> fitness_map = new HashMap<Cloudlet[], Integer>();
 		
 		CplexLPCloudletPlacement place = new CplexLPCloudletPlacement();
 		int[] results = place.cplexModel(C, P, E, cost, latency);
@@ -182,20 +183,24 @@ public class GeneticCloudletPlacement {
 						if(a1_cover >= threshold) {
 							B.add(a1);
 							cover_map.put(a1, a1_cover);
+							fitness_map.put(a1, a1_fit);
 						}
 						if(a2_cover >= threshold) {
 							B.add(a2);
 							cover_map.put(a2, a2_cover);
+							fitness_map.put(a2, a2_fit);
 						}
 				}
 				else {
 					if(c1_cover >= threshold) {
 						B.add(c1);
 						cover_map.put(c1, c1_cover);
+						fitness_map.put(c1, c1_fit);
 					}
 					if(c2_cover >= threshold) {
 						B.add(c2);
 						cover_map.put(c2, c2_cover);
+						fitness_map.put(c2, c2_fit);
 					}
 				}
 			}
@@ -229,6 +234,15 @@ public class GeneticCloudletPlacement {
 		final_cost + " " + final_coverage + " " + final_latency + "\n"
 		+ index + ">" + Arrays.toString(devices_max));
 	}
+
+	/*private boolean underFitnessThreshold(Cloudlet[][] cloudlets, HashMap<Cloudlet[], Integer> fitness_map) {
+		for(Cloudlet[] c: cloudlets) {
+			if(fitness_map.get(c) > 5) {
+				return false;
+			}
+		}
+		return true;
+	}*/
 
 	private int[] maxCoverageIndexes(int[] devices, Cloudlet[] cloudlets) {
 		// TODO Auto-generated method stub
