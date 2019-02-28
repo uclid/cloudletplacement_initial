@@ -70,7 +70,7 @@ public class RunGenetic {
 		
 		long duration = (endTime - startTime)/1000000;
 		
-		System.out.println("Time = " + duration + " ms");
+		System.out.println("\nTime = " + duration + " ms");
 		
 	}
 
