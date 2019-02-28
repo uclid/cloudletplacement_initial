@@ -72,6 +72,7 @@ public class GeneticCloudletPlacement {
 		//int null_counter = 0;
 		CplexDeviceAssignments coverage = new CplexDeviceAssignments();
 		int index = 0;
+		CplexResults result = new CplexResults(false, 0, devices);
 		
 		do {
 			//System.out.println(Arrays.toString(devices));
@@ -221,9 +222,12 @@ public class GeneticCloudletPlacement {
 			} while(!underThreshold(cloudlets, cover_map, threshold));
 			
 			index = selectLeastCost(cloudlets);
+			result = coverage.cplexModel(C, P, E, cloudlets[index], latency);
+			final_latency = result.objective;
 			
-		}while(!coverage.cplexModel(C, P, E, cloudlets[index], latency));
-		System.out.println("\n"+ index + ">" + Arrays.toString(cloudlets[index]) + " " + final_cost);
+		}while(!result.solved);
+		System.out.println("\n"+ index + ">" + Arrays.toString(cloudlets[index]) + " " + final_cost + " " + final_latency);
+		System.out.println(Arrays.toString(result.device_array));
 		
 	}
 	

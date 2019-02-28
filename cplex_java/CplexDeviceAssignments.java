@@ -17,13 +17,15 @@ public class CplexDeviceAssignments {
 	 * @param cost placement cost matrix
 	 * @param latency latency matrix
 	 */
-	public boolean cplexModel(ArrayList<Cloudlet> C, ArrayList<CandidatePoint> P , 
+	public CplexResults cplexModel(ArrayList<Cloudlet> C, ArrayList<CandidatePoint> P , 
 			ArrayList<EndDevice> E, Cloudlet[] cloudlets, int[][] latency) {
 		
 		int w = C.size();
 		int n = P.size();
 		int v = E.size();
 		boolean isSolved = false;
+		double objValue = 0;
+		int[] devices_array = new int[v];
 		
 		try {
 			//new model object
@@ -155,7 +157,7 @@ public class CplexDeviceAssignments {
 			 * */
 			isSolved = model.solve();
 			if(isSolved) {
-				double objValue = model.getObjValue();
+				objValue = model.getObjValue();
 				System.out.println("\nObjective value is: " + objValue);
 				//System.out.print("\nCloudlet Assignments\n");
 				/*for(int j = 0; j < w; j++) {
@@ -165,17 +167,18 @@ public class CplexDeviceAssignments {
 					}
 					//System.out.println("\n");
 				}*/
-				System.out.print("\nDevice Assignments\n");
-				System.out.print("[");
+				//System.out.print("\nDevice Assignments\n");
+				//System.out.print("[");
 				for(int i = 0; i < v; i++) {
 					for(int k=0; k < n; k++) {
 						if(model.getValue(a[i][k]) == 1) {
-							System.out.print(k + ",");
+							devices_array[i] = k;
+							//System.out.print(k + ",");
 						}
 					}
 					//System.out.println("\n");
 				}
-				System.out.print("]");
+				//System.out.print("]");
 				
 			}
 			
@@ -185,7 +188,10 @@ public class CplexDeviceAssignments {
 			System.out.println(e.getMessage());
 		}
 		
-		return isSolved;
+		//System.out.println(Arrays.toString(devices_array));
+		CplexResults c = new CplexResults(isSolved, objValue, devices_array);
+		
+		return c;
 	}
 	
 	public double distance(int x1, int y1, int x2, int y2) {
