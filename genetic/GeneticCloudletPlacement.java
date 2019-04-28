@@ -57,6 +57,8 @@ public class GeneticCloudletPlacement {
 		int[] results = place.cplexModel(C, P, E, cost, latency);
 		estimate_optimal_cost = results[0];
 		min_needed_cloudlets = results[1];
+		//estimate_optimal_cost = 34;
+		//min_needed_cloudlets = 10;
 		System.out.println("LP Optimal cost: " + estimate_optimal_cost + " Placed Cloudlets: " + min_needed_cloudlets);
 		
 		//variable holding assignments for the cloudlets

@@ -15,7 +15,7 @@ public class TestGenetic {
 		//25 end devices as per our optimization example
 		int num_devices = 343;
 		//7 candidate points as per our optimization example
-		int num_candidates = 18;
+		int num_candidates = 16;
 		//number of assignments in the algorithm seed set
 		int assignment_size = 10;
 		//threshold value for coverage, 95% for now

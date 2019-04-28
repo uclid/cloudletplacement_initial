@@ -27,7 +27,7 @@ public class ParseJSON {
 			String item = array.get(i).toString();
 			//tokenize by splitting with commas except when enclosed by quotes
 			String[] tokens = item.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
-			if(item.contains("Central Harlem")) {
+			if(item.contains("East Harlem")) {
 				System.out.println(item);
 				//System.out.println(tokens[14] + " " + tokens[16]);
 				myWiFi.add(tokens[14] + " " + tokens[16]);
@@ -59,12 +59,15 @@ public class ParseJSON {
 		//found it to be roughly 70:100 for Central Harlem
 		//the smallest grid with as many at least 183 points
 		//and this ratio is 14x20
+		//found it 1:2 in East Harlem
+		//the smallest grid with at least 81 points would be
+		//7*14
 		for(Double longitude:myWiFiLon) {
-			x.add(14*(longitude - min_x)/(max_x - min_x));
+			x.add(7*(longitude - min_x)/(max_x - min_x));
 		}
 		
 		for(Double latitude:myWiFiLat) {
-			y.add(20*(latitude - min_y)/(max_y - min_y));
+			y.add(14*(latitude - min_y)/(max_y - min_y));
 		}
 		
 		Set<String> final_coords = new HashSet<String>();
@@ -78,10 +81,10 @@ public class ParseJSON {
 		
 		//generate uninformly distributed indexes based on total points
 		//divide counter to get the desired percentage of candidate points
-		//candidate points are 10%, 20%, 30%, 40%, 50%
-		int points = myWiFi.size()/10;
-		int xrange = 14;
-		int yrange = 20;
+		//candidate points are 10%, 15%, 20%
+		int points = (int)Math.ceil(0.2*myWiFi.size());
+		int xrange = 7;
+		int yrange = 14;
 		Random rand = new Random();
 		System.out.println("------------------------------------");
 		for(int i = 0; i < points; i++) {
@@ -92,7 +95,7 @@ public class ParseJSON {
 			System.out.println(rand.nextInt(yrange+1));
 		}
 		
-		//unform random locations for n devices
+		//uniform random locations for n devices
 		int n = 343;
 		System.out.println("------------------------------------");
 		for(int i = 0; i < n; i++) {

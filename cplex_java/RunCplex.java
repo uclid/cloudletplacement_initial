@@ -9,7 +9,7 @@ public class RunCplex {
 		//25 end devices as per our optimization example
 		int num_devices = 343;
 		//7 candidate points as per our optimization example
-		int num_candidates = 18;
+		int num_candidates = 16;
 		
 		ReadCSV reader = new ReadCSV();
 		int[][] cloudlet_specs = reader.getCloudlets(num_cloudlets);
