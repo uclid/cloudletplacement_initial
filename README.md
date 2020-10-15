@@ -6,5 +6,5 @@ OPL system models and example datasets
 
 This is not a well-maintained version of the project codebase.
 Please see "cloudletplacement_final" repository for latest code.
-<<If you can't find that repository yet, it might be in final statges of
-completion or currently a private repository.>>
+<<If you can't find that repository yet, it might be in final stages of
+release and/or currently a private repository.>>
